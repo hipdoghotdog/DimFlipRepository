@@ -8,7 +8,6 @@ public class CameraScript : MonoBehaviour
     public GameObject @SideCam;
     public GameObject @TopCam;
 
-
     // Start is called before the first frame update
     void Start()
     {
@@ -17,9 +16,12 @@ public class CameraScript : MonoBehaviour
         perspective = 1.0f;
     }
 
+    
+
     // Update is called once per frame
     void Update()
     {
+        
         if (Input.GetKeyDown("v"))
         {
             if ( perspective ==  1.0f )
