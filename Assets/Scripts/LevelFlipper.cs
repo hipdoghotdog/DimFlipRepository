@@ -7,7 +7,7 @@ using UnityEngine;
 public class LevelFlipper : MonoBehaviour
 {
 
-    private GameObject[,,] level;
+    public GameObject[,,] level;
     
     public void SetLevel(GameObject[,,] l) {
         level = l;

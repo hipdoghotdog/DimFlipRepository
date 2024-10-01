@@ -5,6 +5,8 @@ using UnityEngine;
 public class LevelBuilder : MonoBehaviour
 {
     public GameObject blockTemplate;
+    public GameObject startTemplate;
+    public GameObject endTemplate;
     public GameObject levelParent;
     public int[,,] levelTemplate;
 
@@ -20,7 +22,7 @@ public class LevelBuilder : MonoBehaviour
     void levelTemplateSetup()
     {
         levelTemplate = new int[,,] { 
-                                    { { 1, 0, 1 }, { 0, 0, 0 } },
+                                    { { 2, 0, 3 }, { 0, 0, 0 } },
                                     { { 1, 0, 1 }, { 0, 0, 0 } }
                                    ,{ { 1, 1, 0 }, { 0, 0, 1 } },
                                     { { 1, 0, 0 }, { 0, 1, 1 } } 
@@ -43,6 +45,18 @@ public class LevelBuilder : MonoBehaviour
                         GameObject block = Instantiate(blockTemplate, parent);
                         block.transform.position = new Vector3 (i, k, j);
                         level[i,k,j] = block;
+                    }
+                    if (lt[i, k, j] == 2)
+                    {
+                        GameObject block = Instantiate(startTemplate, parent);
+                        block.transform.position = new Vector3(i, k, j);
+                        level[i, k, j] = block;
+                    }
+                    if (lt[i, k, j] == 3)
+                    {
+                        GameObject block = Instantiate(endTemplate, parent);
+                        block.transform.position = new Vector3(i, k, j);
+                        level[i, k, j] = block;
                     }
                 }
             }
