@@ -1,7 +1,9 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using Unity.VisualScripting;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class GameManager : MonoBehaviour
 {
@@ -12,6 +14,8 @@ public class GameManager : MonoBehaviour
     private GameObject[,,] level1;
     private bool init = false;
     public GameObject endScene;
+
+    public Animator camAnimator;
     
     public enum View
     {
@@ -24,7 +28,6 @@ public class GameManager : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        
         lf.SetLevel(lb.RemoteBuild());
         level1 = lf.level;
         player.transform.position = lb.levelParent.transform.position;
@@ -59,51 +62,57 @@ public class GameManager : MonoBehaviour
             currentView = currentView == View.SideView ? View.TopdownView : View.SideView;
             if (currentView == View.TopdownView)
             {
-                cam.transform.position = new Vector3 (level1.GetLength(0) / 2, pp.y + 10, (level1.GetLength(2) / 2)-2);
-                cam.transform.LookAt(new Vector3(level1.GetLength(0) / 2, pp.y, level1.GetLength(2) / 2));
+                camAnimator.SetTrigger("FlipToTopView");
             }
             else if (currentView == View.SideView)
             {
-                cam.transform.position = new Vector3 (level1.GetLength(0) / 2, pp.y + 5, pp.z - 10);
-                cam.transform.LookAt(new Vector3(level1.GetLength(0) / 2, pp.y, pp.z));
+                camAnimator.SetTrigger("FlipToSideView");
             }
         }
-        
-        
 
-
-        // Move Player
-        if (Input.GetKeyDown(KeyCode.RightArrow))
+        // Move Player Right
+        if (Input.GetKeyDown(KeyCode.RightArrow) && pp.x != level1.GetLength(0) -1)
         {
+
+            //
             if (level1[(int)pp.x + 1, (int)pp.y, (int)pp.z] != null)
             {
+                // Move light
                 pp.x += 1;
             }
             
             else if (pp.y != level1.GetLength(1)-1 && level1[(int)pp.x + 1, (int)pp.y + 1, (int)pp.z] != null && currentView == View.SideView)
             {
+                // Step up
                 pp.y += 1;
                 pp.x += 1;
             }
             else if (pp.y != 0 && level1[(int)pp.x + 1, (int)pp.y - 1, (int)pp.z] != null && currentView == View.SideView)
             {
+                // Step down
                 pp.x += 1;
                 pp.y -= 1;
             }
         }
+
         
-        if(Input.GetKeyDown(KeyCode.LeftArrow))
+        // Move Player Left
+        if(Input.GetKeyDown(KeyCode.LeftArrow) && pp.x != 0)
         {
+            // Move left
             if (level1[(int)pp.x - 1, (int)pp.y, (int)pp.z] != null)
             {
                 pp.x -= 1;
             }
 
+            // Move up
             else if (pp.y != level1.GetLength(1) - 1 && level1[(int)pp.x - 1, (int)pp.y + 1, (int)pp.z] != null && currentView == View.SideView)
             {
                 pp.y += 1;
                 pp.x -= 1;
             }
+
+            // Move down
             else if (pp.y != 0 && level1[(int)pp.x - 1, (int)pp.y - 1, (int)pp.z] != null && currentView == View.SideView)
             {
                 pp.x -= 1;
@@ -112,11 +121,13 @@ public class GameManager : MonoBehaviour
 
         }
 
-        if(Input.GetKeyDown(KeyCode.UpArrow) && level1[(int)pp.x,(int)pp.y,(int)pp.z+1] != null && currentView == View.TopdownView){
+        // Move up in top down
+        if(Input.GetKeyDown(KeyCode.UpArrow) && pp.z != level1.GetLength(2)-1 && level1[(int)pp.x,(int)pp.y,(int)pp.z+1] != null && currentView == View.TopdownView){
             pp.z += 1;
         }
 
-        if(Input.GetKeyDown(KeyCode.DownArrow) && level1[(int)pp.x, (int)pp.y, (int)pp.z - 1] != null && currentView == View.TopdownView){
+        // Move down in top down
+        if(Input.GetKeyDown(KeyCode.DownArrow) && pp.z != 0 && level1[(int)pp.x, (int)pp.y, (int)pp.z - 1] != null && currentView == View.TopdownView){
             pp.z -= 1;
         }
         pp.x = Mathf.Clamp(pp.x, 0, (float)level1.GetLength(0)-1);

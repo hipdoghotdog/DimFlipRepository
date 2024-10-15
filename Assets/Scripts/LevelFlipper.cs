@@ -11,7 +11,6 @@ public class LevelFlipper : MonoBehaviour
     
     public void SetLevel(GameObject[,,] l) {
         level = l;
-        Debug.Log("Level is set: " + level);
     }
 
     public void flipLevel(Vector3 pp, GameManager.View view)
@@ -28,16 +27,16 @@ public class LevelFlipper : MonoBehaviour
                 {
                     if(level[i,k,j] == null){continue;}
                     
-                    level[i, k, j].gameObject.SetActive(false);
+                    //level[i, k, j].gameObject.GetComponent<Block>().activate(false);
                     if (view == GameManager.View.SideView)
                     {
                         bool onHeightPlane = (int)level[i, k, j].transform.position.y == ppy;
-                        level[i, k, j].gameObject.SetActive(onHeightPlane);
+                        level[i, k, j].gameObject.GetComponent<Block>().activate(onHeightPlane);
                     }
                     else
                     {
                         bool onSidePlane = (int)level[i, k, j].transform.position.z == ppz;
-                        level[i, k, j].gameObject.SetActive(onSidePlane);
+                        level[i, k, j].gameObject.GetComponent<Block>().activate(onSidePlane);
                     }
                 }
             }
