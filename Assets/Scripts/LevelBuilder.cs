@@ -14,7 +14,7 @@ public class LevelBuilder : MonoBehaviour
     // Start is called before the first frame update
     public GameObject[,,] RemoteBuild()
     {
-        levelTemplateSetup();
+        level2TemplateSetup();
         return buildLevel(levelParent.transform, levelTemplate);
     }
 
@@ -23,10 +23,22 @@ public class LevelBuilder : MonoBehaviour
     {
         levelTemplate = new int[,,] { 
                                     { { 2, 0, 3 }, { 0, 0, 0 } },
-                                    { { 1, 0, 1 }, { 0, 0, 0 } }
-                                   ,{ { 1, 1, 0 }, { 0, 0, 1 } },
+                                    { { 1, 0, 1 }, { 0, 0, 0 } },
+                                    { { 1, 1, 0 }, { 0, 0, 1 } },
                                     { { 1, 0, 0 }, { 0, 1, 1 } } 
                                     };
+    }
+
+    void level2TemplateSetup() 
+    {
+        levelTemplate = new int[,,] {
+                                    {{2,1,0,0}, {0,0,0,1}, {0,0,3,0}, {0,0,0,0}},
+                                    {{0,1,0,0}, {0,0,0,1}, {0,0,0,0}, {0,1,1,0}},
+                                    {{1,1,0,1}, {0,0,0,0}, {1,0,0,1}, {0,1,0,0}},
+                                    {{1,0,1,1}, {0,1,0,0}, {1,0,1,0}, {0,1,0,0}},
+                                    {{0,1,1,0}, {1,0,0,1}, {0,0,0,0}, {0,1,1,0}},
+                                    {{1,0,1,1}, {0,0,0,0}, {0,0,1,1}, {0,0,0,0}}
+        };
     }
 
     // Parent will act as position 0,0,0 for x,y,z coordinates. 

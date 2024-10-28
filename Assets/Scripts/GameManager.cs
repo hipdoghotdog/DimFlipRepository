@@ -25,6 +25,19 @@ public class GameManager : MonoBehaviour
 
     public View currentView;
 
+    void Flip(Vector3 pp) {
+        lf.flipLevel(pp, currentView);
+            currentView = currentView == View.SideView ? View.TopdownView : View.SideView;
+            if (currentView == View.TopdownView)
+            {
+                camAnimator.SetTrigger("FlipToTopView");
+            }
+            else if (currentView == View.SideView)
+            {
+                camAnimator.SetTrigger("FlipToSideView");
+            }
+    }
+
     // Start is called before the first frame update
     void Start()
     {
@@ -56,18 +69,20 @@ public class GameManager : MonoBehaviour
             endScene.SetActive(true);
         }
 
+        if(Input.GetKeyDown(KeyCode.Backspace)) {
+            pp = lb.levelParent.transform.position;
+            if(currentView == View.TopdownView) {
+                Flip(pp);
+            }
+            else{
+                Flip(pp);
+                Flip(pp);
+            }
+        }
+
         // Flip level
         if(Input.GetKeyDown(KeyCode.Space)) {
-            lf.flipLevel(pp, currentView);
-            currentView = currentView == View.SideView ? View.TopdownView : View.SideView;
-            if (currentView == View.TopdownView)
-            {
-                camAnimator.SetTrigger("FlipToTopView");
-            }
-            else if (currentView == View.SideView)
-            {
-                camAnimator.SetTrigger("FlipToSideView");
-            }
+            Flip(pp);
         }
 
         // Move Player Right
