@@ -26,8 +26,7 @@ public class LevelFlipper : MonoBehaviour
                 for (int j = 0; j < level.GetLength(2); j++)
                 {
                     if(level[i,k,j] == null){continue;}
-                    
-                    //level[i, k, j].gameObject.GetComponent<Block>().activate(false);
+
                     if (view == GameManager.View.SideView)
                     {
                         bool onHeightPlane = (int)level[i, k, j].transform.position.y == ppy;
@@ -41,12 +40,6 @@ public class LevelFlipper : MonoBehaviour
                 }
             }
         }
-    }
-
-    private void Start()
-    {
-        
-
     }
 
 

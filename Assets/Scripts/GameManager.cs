@@ -1,7 +1,10 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+//using System.Numerics;
+using System.Security.Cryptography;
 using Unity.VisualScripting;
+using UnityEditor;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
@@ -36,6 +39,44 @@ public class GameManager : MonoBehaviour
             {
                 camAnimator.SetTrigger("FlipToSideView");
             }
+    }
+
+    bool CanIStepOnBlock(Vector3 p) {
+        string b = GetBlock(p).GetBlockType();
+        return !(b == "empty" || b == "left ladder" || b == "right ladder");
+        // || lb.GetUnsteppableBlocks().Contains(b)
+    }
+
+    // take player position and block your want to go to
+    // returns TRUE if there is a valid ladder at the right place
+    bool CanIUseLadder(Vector3 playerPos, Vector3 targetPos) {
+        // Going right
+        if(playerPos.x - targetPos.x == -1) {
+            if(playerPos.y - targetPos.y == -1) {
+                // Climbing up
+                return GetBlock(new Vector3(0,1,0) + playerPos).GetBlockType() == "right ladder";;
+            }
+            else if(playerPos.y - targetPos.y == 1) {
+                // Climbing down
+                return GetBlock(new Vector3(1,0,0) + playerPos).GetBlockType() == "left ladder";
+            }
+        } // Going left
+        else if(playerPos.x - targetPos.x == 1) {
+            if(playerPos.y - targetPos.y == -1) {
+                // Climbing up
+                return GetBlock(new Vector3(0,1,0) + playerPos).GetBlockType() == "left ladder";
+            }
+            else if(playerPos.y - targetPos.y == 1) {
+                // Climbing down
+                return GetBlock(new Vector3(-1,0,0) + playerPos).GetBlockType() == "right ladder";
+            }
+        }
+        return false;
+    }
+
+    Block GetBlock(Vector3 p) {
+        // make dummy blocks instead of nulls, this creates error
+        return level1[(int)p.x, (int)p.y, (int)p.z].GetComponent<Block>();
     }
 
     // Start is called before the first frame update
@@ -89,61 +130,84 @@ public class GameManager : MonoBehaviour
         if (Input.GetKeyDown(KeyCode.RightArrow) && pp.x != level1.GetLength(0) -1)
         {
 
-            //
-            if (level1[(int)pp.x + 1, (int)pp.y, (int)pp.z] != null)
-            {
-                // Move light
-                pp.x += 1;
+            if(currentView == View.TopdownView) {
+                if (CanIStepOnBlock(new Vector3(pp.x+1, pp.y, pp.z)))
+                {
+                    // Move right
+                    pp.x += 1;
+                }
+            }else{
+                Vector3 toPos = new Vector3(pp.x+1, pp.y+1, pp.z);
+                Vector3 toPos2 = new Vector3(pp.x+1, pp.y-1, pp.z);
+                if (pp.y != level1.GetLength(1)-1 && CanIStepOnBlock(toPos) && CanIUseLadder(pp, toPos))
+                {
+                    // Step up if ladder present
+                    pp.y += 1;
+                    pp.x += 1;
+                }
+                else if (pp.y != 0 && CanIStepOnBlock(toPos2) && CanIUseLadder(pp, toPos2))
+                {
+                    // Step down if ladder present
+                    pp.x += 1;
+                    pp.y -= 1;
+                }
+                else if(CanIStepOnBlock(new Vector3(pp.x+1,pp.y,pp.z))) 
+                {
+                    // Move right
+                    pp.x += 1;
+                }
+                
+                
             }
             
-            else if (pp.y != level1.GetLength(1)-1 && level1[(int)pp.x + 1, (int)pp.y + 1, (int)pp.z] != null && currentView == View.SideView)
-            {
-                // Step up
-                pp.y += 1;
-                pp.x += 1;
-            }
-            else if (pp.y != 0 && level1[(int)pp.x + 1, (int)pp.y - 1, (int)pp.z] != null && currentView == View.SideView)
-            {
-                // Step down
-                pp.x += 1;
-                pp.y -= 1;
-            }
+            
+            
         }
 
         
         // Move Player Left
         if(Input.GetKeyDown(KeyCode.LeftArrow) && pp.x != 0)
         {
-            // Move left
-            if (level1[(int)pp.x - 1, (int)pp.y, (int)pp.z] != null)
-            {
-                pp.x -= 1;
+            
+            if(currentView == View.TopdownView){
+                // Move left
+                if (CanIStepOnBlock(new Vector3(pp.x-1, pp.y, pp.z)))
+                {
+                    pp.x -= 1;
+                }
+            }else{
+                Vector3 toPos = new Vector3(pp.x-1, pp.y+1, pp.z);
+                Vector3 toPos2 = new Vector3(pp.x-1, pp.y-1, pp.z);
+                if (pp.y != level1.GetLength(1) - 1 && CanIStepOnBlock(toPos) && CanIUseLadder(pp, toPos))
+                {
+                    // Move up
+                    pp.y += 1;
+                    pp.x -= 1;
+                }
+                else if (pp.y != 0 && CanIStepOnBlock(toPos2) && CanIUseLadder(pp, toPos2))
+                {
+                    // Move down
+                    pp.x -= 1;
+                    pp.y -= 1;
+                }
+                else if (CanIStepOnBlock(new Vector3(pp.x-1, pp.y, pp.z)))
+                {
+                    // Move left
+                    pp.x -= 1;
+                }
             }
-
-            // Move up
-            else if (pp.y != level1.GetLength(1) - 1 && level1[(int)pp.x - 1, (int)pp.y + 1, (int)pp.z] != null && currentView == View.SideView)
-            {
-                pp.y += 1;
-                pp.x -= 1;
-            }
-
-            // Move down
-            else if (pp.y != 0 && level1[(int)pp.x - 1, (int)pp.y - 1, (int)pp.z] != null && currentView == View.SideView)
-            {
-                pp.x -= 1;
-                pp.y -= 1;
-            }
-
         }
 
-        // Move up in top down
-        if(Input.GetKeyDown(KeyCode.UpArrow) && pp.z != level1.GetLength(2)-1 && level1[(int)pp.x,(int)pp.y,(int)pp.z+1] != null && currentView == View.TopdownView){
-            pp.z += 1;
-        }
+        if(currentView == View.TopdownView){
+            // Move up in top down
+            if(Input.GetKeyDown(KeyCode.UpArrow) && pp.z != level1.GetLength(2)-1 && CanIStepOnBlock(new Vector3(pp.x, pp.y, pp.z+1))){
+                pp.z += 1;
+            }
 
-        // Move down in top down
-        if(Input.GetKeyDown(KeyCode.DownArrow) && pp.z != 0 && level1[(int)pp.x, (int)pp.y, (int)pp.z - 1] != null && currentView == View.TopdownView){
-            pp.z -= 1;
+            // Move down in top down
+            if(Input.GetKeyDown(KeyCode.DownArrow) && pp.z != 0 && CanIStepOnBlock(new Vector3(pp.x, pp.y, pp.z-1))){
+                pp.z -= 1;
+            }
         }
         pp.x = Mathf.Clamp(pp.x, 0, (float)level1.GetLength(0)-1);
         pp.y = Mathf.Clamp(pp.y, 0, level1.GetLength(1));

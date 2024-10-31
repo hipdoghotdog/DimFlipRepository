@@ -8,12 +8,18 @@ public class Block : MonoBehaviour
     public bool isActive = true;
     private Animator blockAnim;
 
+    public string blockType;
+
     void Start(){
         blockAnim = gameObject.GetComponent<Animator>();
     }
 
-    public void activate(bool b) {
+    virtual public void activate(bool b) {
         blockAnim.SetBool("isActive", b);
         isActive = b;
+    }
+
+    public string GetBlockType(){
+        return blockType;
     }
 }

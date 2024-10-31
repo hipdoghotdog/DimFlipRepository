@@ -290,9 +290,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: fdd6bf4d9f0a3c84d9e2a44733892549, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  emptyTemplate: {fileID: 924742702580361081, guid: 4eb5b32a313b8dd4980f0cae37d978f5, type: 3}
   blockTemplate: {fileID: 3946397339657139063, guid: b04855dbfc179d849bfaa4f74ef59f27, type: 3}
   startTemplate: {fileID: 3946397339657139063, guid: 52b583de80ccaab4a9ba112622fc89ec, type: 3}
   endTemplate: {fileID: 3946397339657139063, guid: 0345c12f9112d7b4f95f7e018e4e8a8a, type: 3}
+  ladderTemplateRight: {fileID: 2330442209979241904, guid: a7827e732b0efd444836b2530d5270ac, type: 3}
+  ladderTemplateLeft: {fileID: 2330442209979241904, guid: 7df6b99e463fbd04a8703c691aac4385, type: 3}
   levelParent: {fileID: 1689230860}
 --- !u!4 &658312666
 Transform:
