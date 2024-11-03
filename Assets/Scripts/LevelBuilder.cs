@@ -28,9 +28,20 @@ public class LevelBuilder : MonoBehaviour
         };
     }
 
-    public HashSet<GameObject> GetUnsteppableBlocks() {
-        return new HashSet<GameObject>() {
-            ladderTemplateRight, ladderTemplateLeft
+    public HashSet<string> GetUnsteppableBlocks() {
+        return new HashSet<string>() {
+            emptyTemplate.GetComponent<Block>().GetBlockType(),
+            ladderTemplateRight.GetComponent<Block>().GetBlockType(), 
+            ladderTemplateLeft.GetComponent<Block>().GetBlockType()
+        };
+    }
+
+    // Add more if new blocks are added that the player should not be inside
+    public HashSet<string> GetSteppableBlocks() {
+        return new HashSet<string>() {
+            blockTemplate.GetComponent<Block>().GetBlockType(),
+            startTemplate.GetComponent<Block>().GetBlockType(),
+            endTemplate.GetComponent<Block>().GetBlockType()
         };
     }
 
@@ -44,10 +55,20 @@ public class LevelBuilder : MonoBehaviour
     public GameObject[,,] RemoteBuild()
     {
         BuildDictionary();
-        levelTemplateSetup();
+        level0TemplateSetup();
         return buildLevel(levelParent.transform, levelTemplate);
     }
 
+    void level0TemplateSetup(){
+        levelTemplate = new int[,,] {
+            {{2},{0}},
+            {{1},{0}},
+            {{1},{0}},
+            {{1},{1}},
+            {{1},{0}},
+            {{3},{0}},
+        };
+    }
 
     void levelTemplateSetup()
     {
@@ -61,7 +82,7 @@ public class LevelBuilder : MonoBehaviour
 
     void level2TemplateSetup() 
     {
-        levelTemplate = new int[,,] {
+        levelTemplate = new int[,,] { // Get ladders into this!!
                                     {{2,1,0,0}, {0,0,0,1}, {0,0,3,0}, {0,0,0,0}},
                                     {{0,1,0,0}, {0,0,0,1}, {0,0,0,0}, {0,1,1,0}},
                                     {{1,1,0,1}, {0,0,0,0}, {1,0,0,1}, {0,1,0,0}},
@@ -82,6 +103,7 @@ public class LevelBuilder : MonoBehaviour
             {
                 for(int j = 0; j < lt.GetLength(2); j++)
                 {
+
                     // insert block
                     GameObject block = Instantiate(blockTemplates[lt[i,k,j]], parent);
                     block.transform.position = new Vector3(i, k, j);

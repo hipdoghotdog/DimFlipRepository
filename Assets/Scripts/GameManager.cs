@@ -43,9 +43,12 @@ public class GameManager : MonoBehaviour
 
     bool CanIStepOnBlock(Vector3 p) {
         string b = GetBlock(p).GetBlockType();
-        return !(b == "empty" || b == "left ladder" || b == "right ladder");
-        // || lb.GetUnsteppableBlocks().Contains(b)
+        //Debug.Log("Checking steppable");
+        //string bOnTop = p.y <= level1.GetLength(1)-1 ? GetBlock(new Vector3(0,1,0) + p).GetBlockType() : "none";
+        //Debug.Log("Checking top of steppable: " + bOnTop);
+        return !(lb.GetUnsteppableBlocks().Contains(b));
     }
+    //|| lb.GetSteppableBlocks().Contains(bOnTop)
 
     // take player position and block your want to go to
     // returns TRUE if there is a valid ladder at the right place
@@ -134,6 +137,7 @@ public class GameManager : MonoBehaviour
                 if (CanIStepOnBlock(new Vector3(pp.x+1, pp.y, pp.z)))
                 {
                     // Move right
+                    //Debug.Log("Moving right, stepping on block x: " + pp.x+1 + " y: " + pp.y + " z: " + pp.z);
                     pp.x += 1;
                 }
             }else{
@@ -151,7 +155,7 @@ public class GameManager : MonoBehaviour
                     pp.x += 1;
                     pp.y -= 1;
                 }
-                else if(CanIStepOnBlock(new Vector3(pp.x+1,pp.y,pp.z))) 
+                else if(CanIStepOnBlock(new Vector3(pp.x+1,pp.y,pp.z)) && !CanIStepOnBlock(new Vector3(pp.x+1,pp.y+1,pp.z))) 
                 {
                     // Move right
                     pp.x += 1;
@@ -190,7 +194,7 @@ public class GameManager : MonoBehaviour
                     pp.x -= 1;
                     pp.y -= 1;
                 }
-                else if (CanIStepOnBlock(new Vector3(pp.x-1, pp.y, pp.z)))
+                else if (CanIStepOnBlock(new Vector3(pp.x-1, pp.y, pp.z)) && !CanIStepOnBlock(new Vector3(pp.x-1,pp.y+1,pp.z)))
                 {
                     // Move left
                     pp.x -= 1;
