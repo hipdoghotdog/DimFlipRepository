@@ -5,6 +5,7 @@ using UnityEngine;
 
 public class Block : MonoBehaviour
 {
+    public bool switchOn = false;
     public bool isActive = true;
     private Animator blockAnim;
 
@@ -17,6 +18,12 @@ public class Block : MonoBehaviour
     virtual public void activate(bool b) {
         blockAnim.SetBool("isActive", b);
         isActive = b;
+    }
+
+    virtual public void pull(bool b)
+    {
+        blockAnim.SetBool("switchOn", b);
+        switchOn = b;
     }
 
     public string GetBlockType(){

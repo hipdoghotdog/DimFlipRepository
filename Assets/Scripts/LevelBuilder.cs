@@ -12,9 +12,11 @@ public class LevelBuilder : MonoBehaviour
     public GameObject ladderTemplateRight;
     public GameObject ladderTemplateLeft;
     public GameObject levelParent;
+    public GameObject leverTemplate;
     public int[,,] levelTemplate;
-
+    public int currentLevel = 0;
     public Dictionary<int, GameObject> blockTemplates;
+    public Dictionary<int, int> interActPairs;
 
     void BuildDictionary()
     {
@@ -24,7 +26,8 @@ public class LevelBuilder : MonoBehaviour
             {2, startTemplate},
             {3, endTemplate},
             {4, ladderTemplateRight},
-            {5, ladderTemplateLeft}
+            {5, ladderTemplateLeft},
+            {6, leverTemplate }
         };
     }
 
@@ -50,14 +53,35 @@ public class LevelBuilder : MonoBehaviour
             ladderTemplateRight, ladderTemplateLeft
         };
     }
-
+    
     // Start is called before the first frame update
     public GameObject[,,] RemoteBuild()
     {
         BuildDictionary();
-        level0TemplateSetup();
+        levelTemplate = null;   
+        switch(currentLevel)
+        {
+            case 0:
+                level0TemplateSetup();
+                break;
+            case 1: 
+                level1TemplateSetup();
+                break;
+            case 2:
+                level2TemplateSetup();
+                break;
+            case 3:
+                level3TemplateSetup();
+                break;
+            case 4:
+                level4TemplateSetup();
+                break;
+        }
+        
         return buildLevel(levelParent.transform, levelTemplate);
     }
+
+    
 
     void level0TemplateSetup(){
         levelTemplate = new int[,,] {
@@ -68,9 +92,13 @@ public class LevelBuilder : MonoBehaviour
             {{1},{0}},
             {{3},{0}},
         };
+        //interActPairs = new Dictionary<int, int>();
+        //interActPairs.Add(100,2102); //Last digit refers block direction
+                                    //1=UP-DOWN, 2=DOWN-UP, 3=LEFT-RIGHT, 4=RIGHT-LEFT
+
     }
 
-    void levelTemplateSetup()
+    void level1TemplateSetup()
     {
         levelTemplate = new int[,,] { 
                                     { { 2, 0, 3 }, { 0, 0, 0 } },
@@ -80,16 +108,50 @@ public class LevelBuilder : MonoBehaviour
                                     };
     }
 
+    
+
     void level2TemplateSetup() 
     {
-        levelTemplate = new int[,,] { // Get ladders into this!!
-                                    {{2,1,0,0}, {0,0,0,1}, {0,0,3,0}, {0,0,0,0}},
-                                    {{0,1,0,0}, {0,0,0,1}, {0,0,0,0}, {0,1,1,0}},
-                                    {{1,1,0,1}, {0,0,0,0}, {1,0,0,1}, {0,1,0,0}},
-                                    {{1,0,1,1}, {0,1,0,0}, {1,0,1,0}, {0,1,0,0}},
-                                    {{0,1,1,0}, {1,0,0,1}, {0,0,0,0}, {0,1,1,0}},
-                                    {{1,0,1,1}, {0,0,0,0}, {0,0,1,1}, {0,0,0,0}}
+        levelTemplate = new int[,,] { 
+                                    {{2,1,0,0}, {0,0,0,1}, {0,0,3,0}, {0,0,4,0}},
+                                    {{0,1,0,0}, {0,0,0,1}, {0,0,0,4}, {0,1,1,0}},
+                                    {{1,1,0,1}, {0,4,0,0}, {1,0,0,1}, {0,1,0,0}},
+                                    {{1,0,1,1}, {0,1,0,4}, {1,0,1,0}, {0,1,4,0}},
+                                    {{0,1,1,0}, {1,5,0,1}, {5,0,0,4}, {0,1,1,0}},
+                                    {{1,0,1,1}, {5,0,0,0}, {0,0,1,1}, {0,0,5,0}}
         };
+    }
+
+    void level3TemplateSetup()
+    {
+        levelTemplate = new int[,,] {
+            {{2},{0}},
+            {{1},{0}},
+            {{6},{0}},
+            {{0},{1}},
+            {{1},{0}},
+            {{3},{0}},
+        };
+        interActPairs = new Dictionary<int, int>();
+        interActPairs.Add(200,3102); //Last digit refers block direction
+        //1=UP-DOWN, 2=DOWN-UP, 3=LEFT-RIGHT, 4=RIGHT-LEFT
+    }
+
+    void level4TemplateSetup()
+    {
+        levelTemplate = new int[,,] {
+                                    { { 2, 0, 0, 0 }, { 0, 0, 6, 1 } },
+                                    { { 1, 0, 1, 0 }, { 0, 1, 5, 1 } },
+                                    { { 1, 1, 0, 0 }, { 0, 0, 0, 1 } },
+                                    { { 1, 0, 0, 0 }, { 0, 6, 0, 1 } },
+                                    { { 6, 0, 1, 0 }, { 0, 1, 4, 1 } },
+                                    { { 0, 0, 0, 0 }, { 1, 1, 1, 1 } },
+                                    { { 3, 0, 0, 0 }, { 0, 0, 0, 0 } }
+                                    };
+        interActPairs = new Dictionary<int, int>();
+        interActPairs.Add(400, 4112);
+        interActPairs.Add(012, 2014);
+        interActPairs.Add(311, 5102);
     }
 
     // Parent will act as position 0,0,0 for x,y,z coordinates. 

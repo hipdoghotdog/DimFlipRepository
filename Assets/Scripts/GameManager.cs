@@ -7,6 +7,7 @@ using Unity.VisualScripting;
 using UnityEditor;
 using UnityEngine;
 using UnityEngine.SceneManagement;
+using static GameManager;
 
 public class GameManager : MonoBehaviour
 {
@@ -28,25 +29,31 @@ public class GameManager : MonoBehaviour
 
     public View currentView;
 
-    void Flip(Vector3 pp) {
+    void Flip(Vector3 pp, bool camFlip = true) {
+        
         lf.flipLevel(pp, currentView);
             currentView = currentView == View.SideView ? View.TopdownView : View.SideView;
-            if (currentView == View.TopdownView)
+            if (currentView == View.TopdownView && camFlip)
             {
                 camAnimator.SetTrigger("FlipToTopView");
             }
-            else if (currentView == View.SideView)
+            else if (currentView == View.SideView && camFlip)
             {
                 camAnimator.SetTrigger("FlipToSideView");
             }
     }
 
-    bool CanIStepOnBlock(Vector3 p) {
-        string b = GetBlock(p).GetBlockType();
-        //Debug.Log("Checking steppable");
-        //string bOnTop = p.y <= level1.GetLength(1)-1 ? GetBlock(new Vector3(0,1,0) + p).GetBlockType() : "none";
-        //Debug.Log("Checking top of steppable: " + bOnTop);
-        return !(lb.GetUnsteppableBlocks().Contains(b));
+
+
+    bool CanIStepOnBlock(Vector3 p ){
+        
+        
+            string b = GetBlock(p).GetBlockType();
+            //Debug.Log("Checking steppable");
+            //string bOnTop = p.y <= level1.GetLength(1)-1 ? GetBlock(new Vector3(0,1,0) + p).GetBlockType() : "none";
+            //Debug.Log("Checking top of steppable: " + bOnTop);
+            return !(lb.GetUnsteppableBlocks().Contains(b));
+        
     }
     //|| lb.GetSteppableBlocks().Contains(bOnTop)
 
@@ -77,6 +84,8 @@ public class GameManager : MonoBehaviour
         return false;
     }
 
+    
+
     Block GetBlock(Vector3 p) {
         // make dummy blocks instead of nulls, this creates error
         return level1[(int)p.x, (int)p.y, (int)p.z].GetComponent<Block>();
@@ -101,16 +110,119 @@ public class GameManager : MonoBehaviour
         Vector3 pp = player.transform.position;
         if (!init)
         {
-            for (int i = 0; i < 4; i++)
+            player.transform.position.Set(0,0,0);
+            Flip(pp, false);
+            Flip(pp, false);
+            if (currentView == View.TopdownView)
             {
-                lf.flipLevel(pp, currentView);
-                currentView = currentView == View.SideView ? View.TopdownView : View.SideView;
+                Flip(pp);
             }
             init = true;
         }
-        if (level1[(int)pp.x,(int)pp.y,(int)pp.z].gameObject.layer == 3)
+        //When reaching end goal
+        if (GetBlock(pp).GetBlockType() == "end")
         {
-            endScene.SetActive(true);
+            pp = lb.levelParent.transform.position;
+            if (lb.currentLevel == 4)
+            {
+                endScene.SetActive(true);
+            }
+            else
+            {
+
+                lb.currentLevel += 1;
+
+
+
+                /*foreach(var b in level1)
+                {
+                    Destroy(b);
+                }*/
+                for (int i = 0; i < level1.GetLength(0); i++)
+                {
+                    for (int k = 0; k < level1.GetLength(1); k++)
+                    {
+                        for (int j = 0; j < level1.GetLength(2); j++)
+                        {
+                            if (level1[i, k, j] == null) { continue; }
+
+                            Destroy(level1[i, k, j]);
+                        }
+                    }
+                }
+                level1 = null;
+                lf.SetLevel(lb.RemoteBuild());
+                level1 = lf.level;
+                pp = lb.levelParent.transform.position;
+              
+                Vector3 spp = player.transform.position;
+                cam.transform.position = new Vector3(level1.GetLength(0) / 2, spp.y + 5, spp.z - 10);
+                cam.transform.LookAt(new Vector3(level1.GetLength(0) / 2, spp.y, spp.z));
+
+                init = false;
+
+
+            }            
+         
+        }
+
+
+        if(Input.GetKeyDown(KeyCode.E) && GetBlock(pp).GetBlockType() == "lever")
+        {
+            
+            bool state = !GetBlock(pp).switchOn;
+            GetBlock(pp).pull(state);
+            int num = (int)(pp.x * 100 + pp.y * 10 + pp.z);
+
+            int BlockCC = lb.interActPairs[num];
+            int[] c = new int[4];
+            for(int n = 3; n>=0; n--)
+            {
+                c[n] = BlockCC % 10;
+                BlockCC /= 10;
+            }
+            GameObject block = level1[c[0], c[1], c[2]];
+            Vector3 blockPos = block.transform.position;
+            int i = state ? -1 : 1;
+            switch (c[3])
+            {
+                case 1:
+                    i *= -1;
+                    blockPos.y += i;
+                    block.transform.position = (blockPos);
+                    level1[c[0], c[1], c[2]] = lb.blockTemplates[0];
+                    level1[c[0], c[1] + i, c[2]] = block;
+                    break;
+                case 2:
+                    blockPos.y += i;
+                    block.transform.position = (blockPos);
+                    level1[c[0], c[1], c[2]] = lb.blockTemplates[0];
+                    level1[c[0], c[1] + i, c[2]] = block;
+                    break;
+                case 3:
+                    i *= -1;
+                    blockPos.x += i;
+                    block.transform.position = (blockPos);
+                    level1[c[0], c[1], c[2]] = lb.blockTemplates[0];
+                    level1[c[0]+i, c[1], c[2]] = block;
+                    break;
+
+                case 4:
+                    blockPos.x += i;
+                    block.transform.position = (blockPos);
+                    level1[c[0], c[1], c[2]] = lb.blockTemplates[0];
+                    level1[c[0]+i, c[1], c[2]] = block;
+
+                    break;
+            }
+            Flip(pp, false);
+            Flip(pp, false);
+            
+
+            lb.interActPairs[num] = c[0] * 1000 + (c[1] + i) * 100 + c[2] *10 + c[3];
+            
+            //MoveBlock(block);
+
         }
 
         if(Input.GetKeyDown(KeyCode.Backspace)) {
@@ -119,8 +231,8 @@ public class GameManager : MonoBehaviour
                 Flip(pp);
             }
             else{
-                Flip(pp);
-                Flip(pp);
+                Flip(pp, false);
+                Flip(pp, false);
             }
         }
 
@@ -155,7 +267,8 @@ public class GameManager : MonoBehaviour
                     pp.x += 1;
                     pp.y -= 1;
                 }
-                else if(CanIStepOnBlock(new Vector3(pp.x+1,pp.y,pp.z)) && !CanIStepOnBlock(new Vector3(pp.x+1,pp.y+1,pp.z))) 
+                else if(CanIStepOnBlock(new Vector3(pp.x+1,pp.y,pp.z)) && pp.y == level1.GetLength(1)-1 
+                        || CanIStepOnBlock(new Vector3(pp.x + 1, pp.y, pp.z)) && !CanIStepOnBlock(new Vector3(pp.x + 1, pp.y + 1, pp.z))) 
                 {
                     // Move right
                     pp.x += 1;
@@ -194,7 +307,8 @@ public class GameManager : MonoBehaviour
                     pp.x -= 1;
                     pp.y -= 1;
                 }
-                else if (CanIStepOnBlock(new Vector3(pp.x-1, pp.y, pp.z)) && !CanIStepOnBlock(new Vector3(pp.x-1,pp.y+1,pp.z)))
+                else if (CanIStepOnBlock(new Vector3(pp.x-1, pp.y, pp.z)) && pp.y == level1.GetLength(1) - 1 ||
+                        CanIStepOnBlock(new Vector3(pp.x - 1, pp.y, pp.z)) && !CanIStepOnBlock(new Vector3(pp.x-1,pp.y+1,pp.z)))
                 {
                     // Move left
                     pp.x -= 1;
@@ -213,9 +327,9 @@ public class GameManager : MonoBehaviour
                 pp.z -= 1;
             }
         }
-        pp.x = Mathf.Clamp(pp.x, 0, (float)level1.GetLength(0)-1);
-        pp.y = Mathf.Clamp(pp.y, 0, level1.GetLength(1));
-        pp.z = Mathf.Clamp(pp.z, 0, level1.GetLength(2)-1);
+        //pp.x = Mathf.Clamp(pp.x, 0, (float)level1.GetLength(0)-1);
+        //pp.y = Mathf.Clamp(pp.y, 0, level1.GetLength(1));
+        //pp.z = Mathf.Clamp(pp.z, 0, level1.GetLength(2)-1);
 
         player.transform.position = pp;
 
