@@ -18,7 +18,7 @@ public class GameManager : MonoBehaviour
     private GameObject[,,] level1;
     private bool init = false;
     public GameObject endScene;
-
+    
     public Animator camAnimator;
     
     public enum View
@@ -276,8 +276,8 @@ public class GameManager : MonoBehaviour
                 
                 
             }
-            
-            
+
+            player.transform.rotation = Quaternion.Euler(0, 0, 0);
             
         }
 
@@ -314,17 +314,21 @@ public class GameManager : MonoBehaviour
                     pp.x -= 1;
                 }
             }
+            player.transform.rotation = Quaternion.Euler(0, 180, 0);
+
         }
 
         if(currentView == View.TopdownView){
             // Move up in top down
             if(Input.GetKeyDown(KeyCode.UpArrow) && pp.z != level1.GetLength(2)-1 && CanIStepOnBlock(new Vector3(pp.x, pp.y, pp.z+1))){
                 pp.z += 1;
+                player.transform.rotation = Quaternion.Euler(0, -90, 0);
             }
 
             // Move down in top down
             if(Input.GetKeyDown(KeyCode.DownArrow) && pp.z != 0 && CanIStepOnBlock(new Vector3(pp.x, pp.y, pp.z-1))){
                 pp.z -= 1;
+                player.transform.rotation = Quaternion.Euler(0, 90, 0);
             }
         }
         //pp.x = Mathf.Clamp(pp.x, 0, (float)level1.GetLength(0)-1);
