@@ -46,16 +46,9 @@ public class GameManager : MonoBehaviour
 
 
     bool CanIStepOnBlock(Vector3 p ){
-        
-        
             string b = GetBlock(p).GetBlockType();
-            //Debug.Log("Checking steppable");
-            //string bOnTop = p.y <= level1.GetLength(1)-1 ? GetBlock(new Vector3(0,1,0) + p).GetBlockType() : "none";
-            //Debug.Log("Checking top of steppable: " + bOnTop);
-            return !(lb.GetUnsteppableBlocks().Contains(b));
-        
+            return !(lb.GetUnsteppableBlocks().Contains(b));   
     }
-    //|| lb.GetSteppableBlocks().Contains(bOnTop)
 
     // take player position and block your want to go to
     // returns TRUE if there is a valid ladder at the right place
@@ -87,7 +80,6 @@ public class GameManager : MonoBehaviour
     
 
     Block GetBlock(Vector3 p) {
-        // make dummy blocks instead of nulls, this creates error
         return level1[(int)p.x, (int)p.y, (int)p.z].GetComponent<Block>();
     }
 
@@ -173,7 +165,7 @@ public class GameManager : MonoBehaviour
             bool state = !GetBlock(pp).switchOn;
             GetBlock(pp).pull(state);
             int num = (int)(pp.x * 100 + pp.y * 10 + pp.z);
-
+            Debug.Log("num for getting lever is: " + num);
             int BlockCC = lb.interActPairs[num];
             int[] c = new int[4];
             for(int n = 3; n>=0; n--)
