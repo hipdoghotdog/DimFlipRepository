@@ -19,6 +19,9 @@ public class GameManager : MonoBehaviour
     private bool init = false;
     public GameObject endScene;
     
+    public GameObject menu;
+    private bool menuVisible = false;
+
     public Animator camAnimator;
     
     public enum View
@@ -86,6 +89,9 @@ public class GameManager : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
+        // Hide the menu
+        menu.SetActive(false);
+
         lf.SetLevel(lb.RemoteBuild());
         level1 = lf.level;
         player.transform.position = lb.levelParent.transform.position;
@@ -94,6 +100,39 @@ public class GameManager : MonoBehaviour
         cam.transform.position = new Vector3(level1.GetLength(0) / 2, spp.y + 5, spp.z - 10);
         cam.transform.LookAt(new Vector3(level1.GetLength(0) / 2, spp.y, spp.z));
         endScene.SetActive(false);
+    }
+
+    // Used to select levels
+    public void SelectLevel(int level) {
+        Vector3 pp = player.transform.position;
+        lb.currentLevel = level;
+
+        /*foreach(var b in level1)
+        {
+            Destroy(b);
+        }*/
+        for (int i = 0; i < level1.GetLength(0); i++)
+        {
+            for (int k = 0; k < level1.GetLength(1); k++)
+            {
+                for (int j = 0; j < level1.GetLength(2); j++)
+                {
+                    if (level1[i, k, j] == null) { continue; }
+
+                    Destroy(level1[i, k, j]);
+                }
+            }
+        }
+        level1 = null;
+        lf.SetLevel(lb.RemoteBuild());
+        level1 = lf.level;
+        pp = lb.levelParent.transform.position;
+        
+        Vector3 spp = player.transform.position;
+        cam.transform.position = new Vector3(level1.GetLength(0) / 2, spp.y + 5, spp.z - 10);
+        cam.transform.LookAt(new Vector3(level1.GetLength(0) / 2, spp.y, spp.z));
+
+        init = false;   
     }
     
     // Update is called once per frame
@@ -121,41 +160,15 @@ public class GameManager : MonoBehaviour
             }
             else
             {
-
-                lb.currentLevel += 1;
-
-
-
-                /*foreach(var b in level1)
-                {
-                    Destroy(b);
-                }*/
-                for (int i = 0; i < level1.GetLength(0); i++)
-                {
-                    for (int k = 0; k < level1.GetLength(1); k++)
-                    {
-                        for (int j = 0; j < level1.GetLength(2); j++)
-                        {
-                            if (level1[i, k, j] == null) { continue; }
-
-                            Destroy(level1[i, k, j]);
-                        }
-                    }
-                }
-                level1 = null;
-                lf.SetLevel(lb.RemoteBuild());
-                level1 = lf.level;
-                pp = lb.levelParent.transform.position;
-              
-                Vector3 spp = player.transform.position;
-                cam.transform.position = new Vector3(level1.GetLength(0) / 2, spp.y + 5, spp.z - 10);
-                cam.transform.LookAt(new Vector3(level1.GetLength(0) / 2, spp.y, spp.z));
-
-                init = false;
-
-
+                SelectLevel(lb.currentLevel + 1);
             }            
          
+        }
+
+        // Open/Close the menu
+        if(Input.GetKeyDown(KeyCode.Escape)) {
+            menu.SetActive(!menuVisible);
+            menuVisible = !menuVisible;
         }
 
 
