@@ -1,7 +1,9 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class ArtifactManager : MonoBehaviour
 {
@@ -13,7 +15,12 @@ public class ArtifactManager : MonoBehaviour
     private bool displayActive = false;
     private float displayCountdown = 0;
 
+    private TextMesh tm;
     // Make some TMPro magic i guess
+
+    void Start() {
+        tm = gameObject.GetComponentInChildren<TextMesh>();
+    }
 
     // Update is called once per frame
     void Update()
@@ -26,13 +33,16 @@ public class ArtifactManager : MonoBehaviour
             if(displayCountdown <= 0) {
                 displayActive = false;
                 displayCountdown = 0;
+                tm.text = "";
             }
         }
     }
 
     // Will display text and remove it after a few seconds
     public void DisplayText(string text){
-
+        displayActive = true;
+        displayCountdown = 3f;
+        tm.text = text;
     }
 
     

@@ -20,6 +20,8 @@ public class GameManager : MonoBehaviour
     public GameObject endScene;
     
     public Animator camAnimator;
+
+    public ArtifactManager am;
     
     public enum View
     {
@@ -94,6 +96,9 @@ public class GameManager : MonoBehaviour
         cam.transform.position = new Vector3(level1.GetLength(0) / 2, spp.y + 5, spp.z - 10);
         cam.transform.LookAt(new Vector3(level1.GetLength(0) / 2, spp.y, spp.z));
         endScene.SetActive(false);
+
+        //bare for at teste
+        am.DisplayText("Hello There!");
     }
     
     // Update is called once per frame
@@ -165,7 +170,7 @@ public class GameManager : MonoBehaviour
             bool state = !GetBlock(pp).switchOn;
             GetBlock(pp).pull(state);
             int num = (int)(pp.x * 100 + pp.y * 10 + pp.z);
-            Debug.Log("num for getting lever is: " + num);
+            //Debug.Log("num for getting lever is: " + num);
             int BlockCC = lb.interActPairs[num];
             int[] c = new int[4];
             for(int n = 3; n>=0; n--)
@@ -212,8 +217,10 @@ public class GameManager : MonoBehaviour
             
 
             lb.interActPairs[num] = c[0] * 1000 + (c[1] + i) * 100 + c[2] *10 + c[3];
-            
             //MoveBlock(block);
+
+            //Play sound of lever
+            SoundManager.instance.PlaySound(Sound.LEVER);
 
         }
 
@@ -243,6 +250,7 @@ public class GameManager : MonoBehaviour
                     // Move right
                     //Debug.Log("Moving right, stepping on block x: " + pp.x+1 + " y: " + pp.y + " z: " + pp.z);
                     pp.x += 1;
+                    SoundManager.instance.PlaySound(Sound.STEP);
                 }
             }else{
                 Vector3 toPos = new Vector3(pp.x+1, pp.y+1, pp.z);
@@ -252,18 +260,21 @@ public class GameManager : MonoBehaviour
                     // Step up if ladder present
                     pp.y += 1;
                     pp.x += 1;
+                    SoundManager.instance.PlaySound(Sound.STEP);
                 }
                 else if (pp.y != 0 && CanIStepOnBlock(toPos2) && CanIUseLadder(pp, toPos2))
                 {
                     // Step down if ladder present
                     pp.x += 1;
                     pp.y -= 1;
+                    SoundManager.instance.PlaySound(Sound.STEP);
                 }
                 else if(CanIStepOnBlock(new Vector3(pp.x+1,pp.y,pp.z)) && pp.y == level1.GetLength(1)-1 
                         || CanIStepOnBlock(new Vector3(pp.x + 1, pp.y, pp.z)) && !CanIStepOnBlock(new Vector3(pp.x + 1, pp.y + 1, pp.z))) 
                 {
                     // Move right
                     pp.x += 1;
+                    SoundManager.instance.PlaySound(Sound.STEP);
                 }
                 
                 
@@ -283,6 +294,7 @@ public class GameManager : MonoBehaviour
                 if (CanIStepOnBlock(new Vector3(pp.x-1, pp.y, pp.z)))
                 {
                     pp.x -= 1;
+                    SoundManager.instance.PlaySound(Sound.STEP);
                 }
             }else{
                 Vector3 toPos = new Vector3(pp.x-1, pp.y+1, pp.z);
@@ -292,18 +304,21 @@ public class GameManager : MonoBehaviour
                     // Move up
                     pp.y += 1;
                     pp.x -= 1;
+                    SoundManager.instance.PlaySound(Sound.STEP);
                 }
                 else if (pp.y != 0 && CanIStepOnBlock(toPos2) && CanIUseLadder(pp, toPos2))
                 {
                     // Move down
                     pp.x -= 1;
                     pp.y -= 1;
+                    SoundManager.instance.PlaySound(Sound.STEP);
                 }
                 else if (CanIStepOnBlock(new Vector3(pp.x-1, pp.y, pp.z)) && pp.y == level1.GetLength(1) - 1 ||
                         CanIStepOnBlock(new Vector3(pp.x - 1, pp.y, pp.z)) && !CanIStepOnBlock(new Vector3(pp.x-1,pp.y+1,pp.z)))
                 {
                     // Move left
                     pp.x -= 1;
+                    SoundManager.instance.PlaySound(Sound.STEP);
                 }
             }
             player.transform.rotation = Quaternion.Euler(0, 180, 0);
@@ -315,12 +330,14 @@ public class GameManager : MonoBehaviour
             if(Input.GetKeyDown(KeyCode.UpArrow) && pp.z != level1.GetLength(2)-1 && CanIStepOnBlock(new Vector3(pp.x, pp.y, pp.z+1))){
                 pp.z += 1;
                 player.transform.rotation = Quaternion.Euler(0, -90, 0);
+                SoundManager.instance.PlaySound(Sound.STEP);
             }
 
             // Move down in top down
             if(Input.GetKeyDown(KeyCode.DownArrow) && pp.z != 0 && CanIStepOnBlock(new Vector3(pp.x, pp.y, pp.z-1))){
                 pp.z -= 1;
                 player.transform.rotation = Quaternion.Euler(0, 90, 0);
+                SoundManager.instance.PlaySound(Sound.STEP);
             }
         }
         //pp.x = Mathf.Clamp(pp.x, 0, (float)level1.GetLength(0)-1);
