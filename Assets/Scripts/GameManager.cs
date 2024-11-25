@@ -159,7 +159,23 @@ public class GameManager : MonoBehaviour
                 init = false;
 
 
-            }            
+            }    
+            // Get some more dialouge from the artifact
+            switch (lb.currentLevel){
+                case 1:
+                    am.DisplayText("Great! try finding somewhere to climb up");
+                    break;
+                case 2:
+                    am.DisplayText("What a confusing mess of blocks! \nI can reset you back to the start if you get lost");
+                    break;
+                case 3:
+                    am.DisplayText("Well done! Look at that lever there");
+                    break;
+                case 4:
+                    am.DisplayText("Hmm, this look challenging. \nThere must be a catch to get through this");
+                    break;
+            }
+
          
         }
 
@@ -187,27 +203,27 @@ public class GameManager : MonoBehaviour
                     i *= -1;
                     blockPos.y += i;
                     block.transform.position = (blockPos);
-                    level1[c[0], c[1], c[2]] = lb.blockTemplates[0];
+                    level1[c[0], c[1], c[2]] = Instantiate(lb.blockTemplates[0]);
                     level1[c[0], c[1] + i, c[2]] = block;
                     break;
                 case 2:
                     blockPos.y += i;
                     block.transform.position = (blockPos);
-                    level1[c[0], c[1], c[2]] = lb.blockTemplates[0];
+                    level1[c[0], c[1], c[2]] = Instantiate(lb.blockTemplates[0]);
                     level1[c[0], c[1] + i, c[2]] = block;
                     break;
                 case 3:
                     i *= -1;
                     blockPos.x += i;
                     block.transform.position = (blockPos);
-                    level1[c[0], c[1], c[2]] = lb.blockTemplates[0];
+                    level1[c[0], c[1], c[2]] = Instantiate(lb.blockTemplates[0]);
                     level1[c[0]+i, c[1], c[2]] = block;
                     break;
 
                 case 4:
                     blockPos.x += i;
                     block.transform.position = (blockPos);
-                    level1[c[0], c[1], c[2]] = lb.blockTemplates[0];
+                    level1[c[0], c[1], c[2]] = Instantiate(lb.blockTemplates[0]);
                     level1[c[0]+i, c[1], c[2]] = block;
 
                     break;

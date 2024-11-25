@@ -29,11 +29,11 @@ public class SoundManager : MonoBehaviour
     public void PlaySound(Sound sound) {
         switch (sound){
             case Sound.STEP:
-                int randSoundNumber = Random.Range(0, 1);
+                int randSoundNumber = Random.Range(0, 3);
                 au.PlayOneShot(audioClips[randSoundNumber]);
                 break;
             case Sound.LEVER:
-                au.PlayOneShot(audioClips[2]);
+                au.PlayOneShot(audioClips[3]);
                 break;
         }
     }
