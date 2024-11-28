@@ -542,6 +542,7 @@ GameObject:
   - component: {fileID: 721669349}
   - component: {fileID: 721669348}
   - component: {fileID: 721669351}
+  - component: {fileID: 721669352}
   m_Layer: 0
   m_Name: Camera
   m_TagString: Untagged
@@ -631,7 +632,7 @@ Animator:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 721669347}
-  m_Enabled: 1
+  m_Enabled: 0
   m_Avatar: {fileID: 0}
   m_Controller: {fileID: 9100000, guid: f3a60834e011cca449f9297135d4dd28, type: 2}
   m_CullingMode: 0
@@ -644,6 +645,25 @@ Animator:
   m_AllowConstantClipSamplingOptimization: 1
   m_KeepAnimatorStateOnDisable: 0
   m_WriteDefaultValuesOnDisable: 0
+--- !u!114 &721669352
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 721669347}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b293af65a83b8424bbda52f1260d9a97, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  player: {fileID: 1317029474}
+  camAnimator: {fileID: 721669351}
+  followSpeed: 5
+  sideViewOffset: {x: 0, y: 3, z: -6}
+  topViewOffset: {x: 0, y: 7, z: 0}
+  rotationSpeed: 5
+  transitionDuration: 0
 --- !u!1 &1178294421
 GameObject:
   m_ObjectHideFlags: 0

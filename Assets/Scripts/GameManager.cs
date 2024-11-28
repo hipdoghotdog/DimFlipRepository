@@ -21,8 +21,10 @@ public class GameManager : MonoBehaviour
     
     public Animator camAnimator;
 
+    private CameraScript cameraScript;
+
     public ArtifactManager am;
-    
+
     public enum View
     {
         SideView,
@@ -31,20 +33,26 @@ public class GameManager : MonoBehaviour
 
     public View currentView;
 
-    void Flip(Vector3 pp, bool camFlip = true) {
-        
+    void Flip(Vector3 pp, bool camFlip = true)
+    {
         lf.flipLevel(pp, currentView);
-            currentView = currentView == View.SideView ? View.TopdownView : View.SideView;
-            if (currentView == View.TopdownView && camFlip)
-            {
-                camAnimator.SetTrigger("FlipToTopView");
-            }
-            else if (currentView == View.SideView && camFlip)
-            {
-                camAnimator.SetTrigger("FlipToSideView");
-            }
-    }
+        currentView = currentView == View.SideView ? View.TopdownView : View.SideView;
 
+        if (currentView == View.TopdownView && camFlip)
+        {
+            camAnimator.SetTrigger("FlipToTopView");
+        }
+        else if (currentView == View.SideView && camFlip)
+        {
+            camAnimator.SetTrigger("FlipToSideView");
+        }
+
+        // Notify CameraScript to switch view
+        if (camFlip && cameraScript != null)
+        {
+            cameraScript.FlipView(currentView);
+        }
+    }
 
 
     bool CanIStepOnBlock(Vector3 p ){
@@ -91,16 +99,23 @@ public class GameManager : MonoBehaviour
         lf.SetLevel(lb.RemoteBuild());
         level1 = lf.level;
         player.transform.position = lb.levelParent.transform.position;
-        
+
         Vector3 spp = player.transform.position;
         cam.transform.position = new Vector3(level1.GetLength(0) / 2, spp.y + 5, spp.z - 10);
         cam.transform.LookAt(new Vector3(level1.GetLength(0) / 2, spp.y, spp.z));
         endScene.SetActive(false);
 
-        //bare for at teste
         am.DisplayText("Hello There!");
+
+        // Initialize CameraScript reference
+        cameraScript = cam.GetComponent<CameraScript>();
+        if (cameraScript == null)
+        {
+            Debug.LogError("CameraScript component not found on the camera.");
+        }
     }
-    
+
+
     // Update is called once per frame
     void Update()
     {
