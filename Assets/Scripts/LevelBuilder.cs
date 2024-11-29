@@ -17,6 +17,7 @@ public class LevelBuilder : MonoBehaviour
     public int currentLevel = 0;
     public Dictionary<int, GameObject> blockTemplates;
     public Dictionary<int, int> interActPairs;
+    public Vector3 startBlockPosition;
 
     void BuildDictionary()
     {
@@ -62,7 +63,7 @@ public class LevelBuilder : MonoBehaviour
         switch(currentLevel)
         {
             case 0:
-                level0TemplateSetup();
+                level8TemplateSetup();
                 break;
             case 1: 
                 level1TemplateSetup();
@@ -154,26 +155,116 @@ public class LevelBuilder : MonoBehaviour
         interActPairs.Add(311, 5102);
     }
 
-    // Parent will act as position 0,0,0 for x,y,z coordinates. 
-    // lt[0][0][0] will be exactly at parent position
-    public GameObject[,,] buildLevel(Transform parent, int[,,] lt)
+    /*
+          void level5TemplateSetup() //DONE
+    {
+        // Define the layout using a 3D array
+        levelTemplate = new int[,,] {
+            { { 2, 0, 6, 1 }, { 0, 0, 0, 0 }, { 0, 1, 4, 0 } },
+            { { 1, 0, 0, 1 }, { 0, 1, 1, 1 }, { 5, 0, 0, 4 } },
+            { { 1, 1, 0, 1 }, { 0, 4, 0, 0 }, { 0, 0, 6, 1 } },
+            { { 0, 0, 0, 1 }, { 1, 1, 1, 1 }, { 0, 0, 0, 0 } },
+            { { 1, 0, 1, 1 }, { 4, 0, 5, 0 }, { 0, 3, 0, 0 } },
+            { { 0, 0, 0, 0 }, { 1, 1, 0, 0 }, { 0, 1, 0, 0 } },
+            { { 0, 0, 0, 0 }, { 0, 1, 0, 0 }, { 0, 5, 0, 0 } },
+            { { 0, 0, 0, 0 }, { 1, 1, 1, 1 }, { 0, 0, 0, 0 } },
+            { { 0, 0, 0, 0 }, { 1, 1, 1, 1 }, { 0, 0, 0, 0 } },
+        };
+        interActPairs = new Dictionary<int, int>();
+        interActPairs.Add(002, 0222);
+        interActPairs.Add(222, 3102);
+    }
+
+    void level6TemplateSetup()
+    {
+        // Define the layout using a 3D array
+        levelTemplate = new int[,,] {
+            { { 2, 0, 0, 0, 0 }, { 0, 0, 0, 0, 0 }, { 0, 0, 0, 0, 0 } },
+            { { 1, 0, 0, 0, 0 }, { 0, 0, 0, 0, 0 }, { 0, 0, 0, 0, 0 } },
+            { { 1, 1, 1, 1, 1 }, { 0, 0, 0, 4, 0 }, { 0, 0, 0, 0, 0 } },
+            { { 1, 0, 1, 0, 0 }, { 0, 0, 4, 1, 1 }, { 0, 0, 0, 0, 0 } },
+            { { 0, 0, 0, 0, 0 }, { 0, 0, 1, 0, 1 }, { 0, 0, 0, 0, 0 } },
+            { { 1, 1, 1, 1, 1 }, { 0, 0, 0, 0, 5 }, { 0, 0, 0, 0, 0 } },
+            { { 0, 0, 0, 0, 0 }, { 0, 0, 0, 0, 0 }, { 0, 0, 0, 0, 0 } },
+            { { 0, 0, 0, 0, 0 }, { 0, 0, 0, 0, 0 }, { 0, 0, 0, 0, 0 } },
+
+        };
+        interActPairs = new Dictionary<int, int>();
+        interActPairs.Add(002, 0222);
+        interActPairs.Add(222, 3102);
+    }
+
+        void level7TemplateSetup()
+    {
+        // Define the layout using a 3D array
+        levelTemplate = new int[,,] {
+            { { 1, 1, 1, 2, 1, 1 }, { 0, 0, 0, 0, 0, 4 }, { 0, 0, 0, 0, 0, 0 } },
+            { { 1, 0, 0, 1, 0, 0 }, { 0, 0, 0, 0, 0, 1 }, { 0, 0, 0, 0, 0, 0 } },
+            { { 1, 0, 0, 1, 0, 0 }, { 0, 1, 0, 0, 0, 1 }, { 0, 0, 1, 1, 0, 0 } },
+            { { 0, 1, 0, 0, 0, 0 }, { 0, 6, 1, 1, 1, 1 }, { 0, 0, 5, 0, 0, 4 } },
+            { { 1, 1, 0, 1, 0, 0 }, { 0, 0, 0, 0, 0, 0 }, { 0, 0, 0, 1, 0, 1 } },
+            { { 1, 0, 0, 1, 1, 6 }, { 0, 0, 0, 0, 0, 0 }, { 0, 0, 0, 1, 1, 1 } },
+            { { 3, 0, 1, 1, 0, 0 }, { 0, 0, 0, 0, 0, 0 }, { 0, 0, 0, 0, 0, 0 } },
+
+        };
+        interActPairs = new Dictionary<int, int>();
+        interActPairs.Add(311, 3131);
+        interActPairs.Add(505, 2112);
+
+        //interActPairs.Add(002, 0222);
+        //interActPairs.Add(222, 3102);
+    }
+
+    
+     */
+
+
+    void level8TemplateSetup()
+    {
+        levelTemplate = new int[,,] {
+            { { 0, 0, 0, 0, 0, 0 }, { 0, 0, 0, 1, 1, 1 }, { 0, 0, 0, 0, 0, 0 }, { 0, 0, 0, 0, 0, 0 } },
+            { { 0, 0, 0, 1, 1, 1 }, { 0, 0, 1, 1, 5, 1 }, { 0, 0, 0, 4, 0, 0 }, { 0, 0, 0, 0, 0, 0 } },
+            { { 0, 0, 0, 0, 0, 1 }, { 0, 0, 0, 0, 0, 4 }, { 0, 0, 1, 1, 1, 0 }, { 0, 0, 4, 0, 4, 0 } },
+            { { 0, 0, 0, 0, 0, 0 }, { 0, 1, 1, 1, 1, 1 }, { 0, 0, 0, 0, 0, 0 }, { 1, 1, 1, 0, 1, 1 } },
+            { { 0, 0, 0, 0, 0, 0 }, { 0, 1, 1, 1, 1, 1 }, { 0, 0, 0, 0, 0, 0 }, { 1, 0, 0, 6, 0, 1 } },
+            { { 0, 0, 0, 0, 0, 0 }, { 0, 1, 1, 2, 1, 1 }, { 1, 0, 0, 0, 6, 1 }, { 5, 0, 0, 1, 0, 5 } },
+            { { 6, 0, 0, 0, 0, 0 }, { 0, 1, 1, 1, 1, 1 }, { 1, 1, 1, 1, 0, 0 }, { 4, 0, 0, 5, 0, 0 } },
+            { { 1, 0, 0, 0, 0, 0 }, { 4, 1, 1, 1, 0, 1 }, { 0, 0, 0, 0, 0, 0 }, { 1, 1, 1, 1, 0, 0 } }, 
+            { { 0, 1, 1, 1, 1, 1 }, { 1, 4, 1, 0, 3, 5 }, { 0, 0, 4, 0, 0, 0 }, { 1, 1, 0, 1, 0, 0 } },
+            { { 0, 0, 0, 0, 0, 0 }, { 1, 1, 0, 0, 0, 0 }, { 0, 0, 1, 1, 0, 0 }, { 0, 0, 0, 5, 0, 0 } }, 
+        };
+        interActPairs = new Dictionary<int, int>();
+        interActPairs.Add(600, 9232);
+        interActPairs.Add(524, 8031);
+        interActPairs.Add(433, 8143);
+    }
+
+        // Parent will act as position 0,0,0 for x,y,z coordinates. 
+        // lt[0][0][0] will be exactly at parent position
+        public GameObject[,,] buildLevel(Transform parent, int[,,] lt)
     {
         GameObject[,,] level = new GameObject[lt.GetLength(0), lt.GetLength(1), lt.GetLength(2)];
-        for(int i = 0; i < lt.GetLength(0); i++)
+        for (int i = 0; i < lt.GetLength(0); i++)
         {
-            for(int k = 0; k < lt.GetLength(1); k++)
+            for (int k = 0; k < lt.GetLength(1); k++)
             {
-                for(int j = 0; j < lt.GetLength(2); j++)
+                for (int j = 0; j < lt.GetLength(2); j++)
                 {
-
-                    // insert block
-                    GameObject block = Instantiate(blockTemplates[lt[i,k,j]], parent);
+                    // Instantiate the block
+                    GameObject block = Instantiate(blockTemplates[lt[i, k, j]], parent);
                     block.transform.position = new Vector3(i, k, j);
                     level[i, k, j] = block;
+
+                    // Check if the block is the startTemplate
+                    if (lt[i, k, j] == 2) // Assuming 2 corresponds to startTemplate
+                    {
+                        startBlockPosition = new Vector3(i, k, j);
+                    }
                 }
             }
         }
         return level;
     }
+
 
 }

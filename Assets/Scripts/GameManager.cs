@@ -112,12 +112,29 @@ public class GameManager : MonoBehaviour
         return level1[(int)p.x, (int)p.y, (int)p.z].GetComponent<Block>();
     }
 
+    /*
+     void Start()
+    {
+        lf.SetLevel(lb.RemoteBuild());
+        level1 = lf.level;
+        player.transform.position = lb.levelParent.transform.position;
+        
+        Vector3 spp = player.transform.position;
+        cam.transform.position = new Vector3(level1.GetLength(0) / 2, spp.y + 5, spp.z - 10);
+        cam.transform.LookAt(new Vector3(level1.GetLength(0) / 2, spp.y, spp.z));
+        endScene.SetActive(false);
+
+        //bare for at teste
+        am.DisplayText("Hello There!");
+    }
+     */
+
     // Start is called before the first frame update
     void Start()
     {
         lf.SetLevel(lb.RemoteBuild());
         level1 = lf.level;
-        player.transform.position = lb.levelParent.transform.position;
+        player.transform.position = lb.startBlockPosition;
         logicalPosition = player.transform.position; // Initialize logical position
 
         Vector3 spp = player.transform.position;
@@ -142,7 +159,7 @@ public class GameManager : MonoBehaviour
     {
         if (!init)
         {
-            player.transform.position = new Vector3(0, 0, 0);
+            player.transform.position = lb.startBlockPosition;
             logicalPosition = player.transform.position; // Ensure logical position is set
             Flip(logicalPosition, false);
             Flip(logicalPosition, false);
@@ -357,7 +374,7 @@ public class GameManager : MonoBehaviour
         // When reaching end goal
         if (GetBlock(pp).GetBlockType() == "end")
         {
-            pp = lb.levelParent.transform.position;
+            //pp = lb.levelParent.transform.position;
             logicalPosition = pp;
             player.transform.position = pp;
 
@@ -387,7 +404,8 @@ public class GameManager : MonoBehaviour
                 // Load new level
                 lf.SetLevel(lb.RemoteBuild());
                 level1 = lf.level;
-                pp = lb.levelParent.transform.position;
+
+                pp = lb.startBlockPosition;
                 logicalPosition = pp;
                 player.transform.position = pp;
 
