@@ -40,6 +40,9 @@ public class GameManager : MonoBehaviour
     private bool isMoving = false;
     public float moveSpeed = 5f; // Adjust for movement speed
 
+    private Quaternion targetRotation;
+    public float rotationSpeed = 720f;
+
     void Flip(Vector3 pp, bool camFlip = true)
     {
         lf.flipLevel(pp, currentView);
@@ -127,6 +130,8 @@ public class GameManager : MonoBehaviour
         {
             Debug.LogError("CameraScript component not found on the camera.");
         }
+
+        targetRotation = player.transform.rotation;
     }
 
     // Update is called once per frame
@@ -144,6 +149,13 @@ public class GameManager : MonoBehaviour
             }
             init = true;
         }
+
+        // Handle smooth rotation
+        player.transform.rotation = Quaternion.RotateTowards(
+            player.transform.rotation,
+            targetRotation,
+            rotationSpeed * Time.deltaTime
+        );
 
         if (!isMoving)
         {
@@ -181,6 +193,9 @@ public class GameManager : MonoBehaviour
         Vector3 newPP = pp;
         bool movementKeyPressed = false;
 
+        // Define a temporary variable for desired rotation
+        Quaternion desiredRotation = player.transform.rotation;
+
         // Move Player Right
         if (Input.GetKeyDown(KeyCode.RightArrow) && pp.x != level1.GetLength(0) - 1)
         {
@@ -190,7 +205,7 @@ public class GameManager : MonoBehaviour
                 {
                     newPP.x += 1;
                     SoundManager.instance.PlaySound(Sound.STEP);
-                    player.transform.rotation = Quaternion.Euler(0, 0, 0);
+                    desiredRotation = Quaternion.Euler(0, 0, 0);
                     movementKeyPressed = true;
                 }
             }
@@ -223,7 +238,7 @@ public class GameManager : MonoBehaviour
                     SoundManager.instance.PlaySound(Sound.STEP);
                     movementKeyPressed = true;
                 }
-                player.transform.rotation = Quaternion.Euler(0, 0, 0);
+                desiredRotation = Quaternion.Euler(0, 0, 0);
             }
         }
 
@@ -236,7 +251,7 @@ public class GameManager : MonoBehaviour
                 {
                     newPP.x -= 1;
                     SoundManager.instance.PlaySound(Sound.STEP);
-                    player.transform.rotation = Quaternion.Euler(0, 180, 0);
+                    desiredRotation = Quaternion.Euler(0, 180, 0);
                     movementKeyPressed = true;
                 }
             }
@@ -269,7 +284,7 @@ public class GameManager : MonoBehaviour
                     SoundManager.instance.PlaySound(Sound.STEP);
                     movementKeyPressed = true;
                 }
-                player.transform.rotation = Quaternion.Euler(0, 180, 0);
+                desiredRotation = Quaternion.Euler(0, 180, 0);
             }
         }
 
@@ -280,7 +295,7 @@ public class GameManager : MonoBehaviour
             {
                 newPP.z += 1;
                 SoundManager.instance.PlaySound(Sound.STEP);
-                player.transform.rotation = Quaternion.Euler(0, -90, 0);
+                desiredRotation = Quaternion.Euler(0, -90, 0);
                 movementKeyPressed = true;
             }
 
@@ -289,19 +304,29 @@ public class GameManager : MonoBehaviour
             {
                 newPP.z -= 1;
                 SoundManager.instance.PlaySound(Sound.STEP);
-                player.transform.rotation = Quaternion.Euler(0, 90, 0);
+                desiredRotation = Quaternion.Euler(0, 90, 0);
                 movementKeyPressed = true;
             }
         }
 
         if (movementKeyPressed && newPP != pp)
         {
-            // Start moving towards target position
+            // Calculate the angle difference
+            float angleDifference = Quaternion.Angle(player.transform.rotation, desiredRotation);
+
+            // Only set targetRotation if the difference is significant
+            if (angleDifference > 1f)
+            {
+                targetRotation = desiredRotation;
+            }
+
+            // Start moving towards the target position
             targetPosition = newPP;
             isMoving = true;
             playerAnimator.SetBool("isWalking", true);
         }
     }
+
 
     void MovePlayer()
     {
@@ -320,6 +345,7 @@ public class GameManager : MonoBehaviour
             HandlePostMovementInteractions();
         }
     }
+
 
     void HandlePostMovementInteractions()
     {
