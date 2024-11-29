@@ -6228,8 +6228,10 @@ MonoBehaviour:
   camAnimator: {fileID: 721669351}
   playerAnimator: {fileID: 1962308937}
   am: {fileID: 1178294422}
+  leverAnimationDuration: 0.6
   currentView: 0
   moveSpeed: 4
+  rotationSpeed: 720
 --- !u!4 &1795125596
 Transform:
   m_ObjectHideFlags: 0

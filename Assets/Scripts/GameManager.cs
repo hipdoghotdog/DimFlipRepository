@@ -32,6 +32,9 @@ public class GameManager : MonoBehaviour
         TopdownView
     }
 
+    private bool isInteracting = false;
+    public float leverAnimationDuration = .6f;
+
     public View currentView;
 
     // Movement variables
@@ -416,8 +419,31 @@ public class GameManager : MonoBehaviour
 
     void HandleLeverInteraction(Vector3 pp)
     {
+        if (isInteracting) return;
+        StartCoroutine(HandleLeverInteractionCoroutine(pp));
+    }
+
+    IEnumerator HandleLeverInteractionCoroutine(Vector3 pp)
+    {
+        isInteracting = true;
+
+        // Trigger the player animation
+        playerAnimator.SetTrigger("Pull"); 
+
+        yield return new WaitForSeconds(leverAnimationDuration);
+
+        ApplyLeverEffects(pp);
+
+        isInteracting = false;
+    }
+
+    void ApplyLeverEffects(Vector3 pp)
+    {
+        // Toggle the lever state
         bool state = !GetBlock(pp).switchOn;
         GetBlock(pp).pull(state);
+
+        // Existing lever interaction logic
         int num = (int)(pp.x * 100 + pp.y * 10 + pp.z);
         int BlockCC = lb.interActPairs[num];
         int[] c = new int[4];
@@ -434,27 +460,27 @@ public class GameManager : MonoBehaviour
             case 1:
                 i *= -1;
                 blockPos.y += i;
-                block.transform.position = (blockPos);
+                block.transform.position = blockPos;
                 level1[c[0], c[1], c[2]] = Instantiate(lb.blockTemplates[0]);
                 level1[c[0], c[1] + i, c[2]] = block;
                 break;
             case 2:
                 blockPos.y += i;
-                block.transform.position = (blockPos);
+                block.transform.position = blockPos;
                 level1[c[0], c[1], c[2]] = Instantiate(lb.blockTemplates[0]);
                 level1[c[0], c[1] + i, c[2]] = block;
                 break;
             case 3:
                 i *= -1;
                 blockPos.x += i;
-                block.transform.position = (blockPos);
+                block.transform.position = blockPos;
                 level1[c[0], c[1], c[2]] = Instantiate(lb.blockTemplates[0]);
                 level1[c[0] + i, c[1], c[2]] = block;
                 break;
 
             case 4:
                 blockPos.x += i;
-                block.transform.position = (blockPos);
+                block.transform.position = blockPos;
                 level1[c[0], c[1], c[2]] = Instantiate(lb.blockTemplates[0]);
                 level1[c[0] + i, c[1], c[2]] = block;
 
@@ -465,9 +491,12 @@ public class GameManager : MonoBehaviour
 
         lb.interActPairs[num] = c[0] * 1000 + (c[1] + i) * 100 + c[2] * 10 + c[3];
 
-        // Play sound of lever
+        // Play lever sound
         SoundManager.instance.PlaySound(Sound.LEVER);
     }
+
+
+
 
     void ResetPlayerPosition()
     {
