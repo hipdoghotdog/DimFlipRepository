@@ -63,10 +63,10 @@ public class LevelBuilder : MonoBehaviour
         switch(currentLevel)
         {
             case 0:
-                level8TemplateSetup();
+                level9TemplateSetup();
                 break;
             case 1: 
-                level1TemplateSetup();
+                level8TemplateSetup();
                 break;
             case 2:
                 level2TemplateSetup();
@@ -239,9 +239,27 @@ public class LevelBuilder : MonoBehaviour
         interActPairs.Add(433, 8143);
     }
 
-        // Parent will act as position 0,0,0 for x,y,z coordinates. 
-        // lt[0][0][0] will be exactly at parent position
-        public GameObject[,,] buildLevel(Transform parent, int[,,] lt)
+    void level9TemplateSetup()
+    {
+        levelTemplate = new int[,,] {
+            { { 1, 1, 1, 1, 1}, { 4, 0, 0, 0, 0}, { 0, 0, 1, 1, 1 }, { 0, 0, 0, 0, 0 } },
+            { { 0, 0, 1, 0, 1}, { 6, 0, 1, 0, 0}, { 0, 0, 0, 1, 1 }, { 0, 0, 0, 0, 4 } },
+            { { 0, 0, 1, 0, 1}, { 0, 0, 1, 1, 0}, { 1, 1, 0, 5, 0 }, { 0, 4, 0, 0, 1 } },
+            { { 0, 0, 0, 0, 1}, { 0, 0, 2, 0, 4}, { 1, 0, 0, 0, 0 }, { 0, 1, 0, 0, 6 } },
+            { { 0, 0, 1, 0, 0}, { 1, 1, 0, 0, 1}, { 5, 0, 0, 0, 0 }, { 0, 1, 6, 0, 0 } },
+            { { 0, 0, 1, 0, 0}, { 1, 1, 0, 1, 1}, { 0, 4, 0, 0, 4 }, { 0, 0, 0, 1, 0 } },
+            { { 0, 0, 1, 0, 0}, { 0, 0, 0, 0, 0}, { 1, 1, 0, 0, 1 }, { 4, 0, 0, 1, 0 } },
+            { { 0, 0, 0, 0, 0}, { 0, 0, 3, 0, 0}, { 0, 0, 0, 1, 1 }, { 1, 1, 1, 5, 0 } },
+        };
+        interActPairs = new Dictionary<int, int>();
+        interActPairs.Add(334, 4021);
+        interActPairs.Add(432, 5021);
+        interActPairs.Add(110, 6021);
+    }
+
+    // Parent will act as position 0,0,0 for x,y,z coordinates. 
+    // lt[0][0][0] will be exactly at parent position
+    public GameObject[,,] buildLevel(Transform parent, int[,,] lt)
     {
         GameObject[,,] level = new GameObject[lt.GetLength(0), lt.GetLength(1), lt.GetLength(2)];
         for (int i = 0; i < lt.GetLength(0); i++)
