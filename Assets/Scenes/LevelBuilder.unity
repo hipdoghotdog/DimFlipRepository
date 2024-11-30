@@ -6311,11 +6311,6 @@ MonoBehaviour:
   am: {fileID: 1178294422}
   pm: {fileID: 0}
   currentView: 0
-  logicalPosition: {x: 0, y: 0, z: 0}
-  targetPosition: {x: 0, y: 0, z: 0}
-  isMoving: 0
-  moveSpeed: 5
-  targetRotation: {x: 0, y: 0, z: 0, w: 0}
 --- !u!4 &1795125596
 Transform:
   m_ObjectHideFlags: 0
@@ -6487,7 +6482,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: ee50d4bdf77249b48954a9ca2b40f0a2, type: 3}
       propertyPath: m_LocalPosition.x
-      value: -0.3
+      value: -0.2
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: ee50d4bdf77249b48954a9ca2b40f0a2, type: 3}
       propertyPath: m_LocalPosition.y

@@ -30,10 +30,7 @@ public class GameManager : MonoBehaviour
         TopdownView
     }
 
-    public View currentView;
-
-    // Movement variables
-    public bool isMoving = false;
+    public View currentView;    
 
     void Start()
     {
@@ -88,15 +85,6 @@ public class GameManager : MonoBehaviour
             init = true;
         }
         HandleInput();
-
-        if (!isMoving)
-        {
-           
-        }
-        else
-        {
-            //pm.MovePlayer();
-        }
     }
 
     void HandleInput()
