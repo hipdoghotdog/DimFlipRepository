@@ -24,6 +24,7 @@ public class Block : MonoBehaviour
             {
                 case "block":
                 case "blockwlight":
+                case "lever":
                     meshRenderer.material = theme.blockMaterial;
                     break;
                 case "empty":
@@ -39,9 +40,7 @@ public class Block : MonoBehaviour
                 case "left ladder":
                     meshRenderer.material = theme.ladderMaterial;
                     break;
-                case "lever":
-                    meshRenderer.material = theme.leverMaterial;
-                    break;
+           
                 default:
                     Debug.LogWarning($"Block: Unknown blockType '{blockType}'. No material applied.");
                     break;
@@ -55,9 +54,6 @@ public class Block : MonoBehaviour
         {
             blockAnim.SetBool("isActive", state);
         }
-        else
-        {
-        }
         isActive = state;
     }
 
@@ -66,9 +62,6 @@ public class Block : MonoBehaviour
         if (blockAnim != null)
         {
             blockAnim.SetBool("switchOn", state);
-        }
-        else
-        {
         }
         switchOn = state;
     }

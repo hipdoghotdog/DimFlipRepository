@@ -84,7 +84,9 @@ public class GameManager : MonoBehaviour
             }
             init = true;
         }
-        HandleInput();
+        if (!pm.isMoving) { 
+            HandleInput();
+        }
     }
 
     void HandleInput()

@@ -11,7 +11,7 @@ public class PlayerMovement : MonoBehaviour
     public Animator playerAnimator;
     private Quaternion targetRotation;
     private Vector3 targetPosition;
-    private bool isMoving = false;
+    public bool isMoving = false;
 
     // Movement queue for handling step-by-step movement
     private Queue<Vector3> movementQueue = new Queue<Vector3>();
@@ -154,46 +154,32 @@ public class PlayerMovement : MonoBehaviour
         }
         return false;
     }
-
-    /// <summary>
-    /// Starts the player movement. If it's a downward ladder movement, sets up a movement queue.
-    /// </summary>
-    /// <param name="newPosition">The target position to move to.</param>
-    /// <param name="desiredRotation">The desired rotation after movement.</param>
-    /// <param name="isDownwardLadderMovement">Flag indicating if the movement is a downward ladder movement.</param>
     void StartMovement(Vector3 newPosition, Quaternion desiredRotation, bool isDownwardLadderMovement = false)
     {
         if (isDownwardLadderMovement)
         {
-            // Clear any existing movement queue
             movementQueue.Clear();
 
             Vector3 currentPosition = transform.position;
             Vector3 delta = newPosition - currentPosition;
 
-            // For downward movement, define intermediate steps to prevent phasing
-            // Example: Move horizontally first, then down
             if (delta.x != 0 && delta.y != 0)
             {
-                // Moving down a ladder
-                Vector3 intermediatePos = new Vector3(currentPosition.x + delta.x, currentPosition.y, currentPosition.z); // Move horizontally first
+                Vector3 intermediatePos = new Vector3(currentPosition.x + delta.x, currentPosition.y, currentPosition.z); 
                 movementQueue.Enqueue(intermediatePos);
-                movementQueue.Enqueue(newPosition); // Then move down
+                movementQueue.Enqueue(newPosition); 
             }
             else
             {
-                // If not a diagonal movement, just enqueue the new position
                 movementQueue.Enqueue(newPosition);
             }
 
-            // Set the first target position from the queue
             targetPosition = movementQueue.Dequeue();
             isMoving = true;
             playerAnimator.SetBool("isWalking", true);
         }
         else
         {
-            // Non-downward movement, use the standard movement method
             movementQueue.Clear();
             movementQueue.Enqueue(newPosition);
 

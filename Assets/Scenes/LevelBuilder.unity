@@ -5926,9 +5926,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b1d470d6858314d40a71d47712a285ad, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  moveSpeed: 5
+  moveSpeed: 4
   rotationSpeed: 720
   playerAnimator: {fileID: 1962308937}
+  isMoving: 0
 --- !u!1 &1322897588
 GameObject:
   m_ObjectHideFlags: 0
