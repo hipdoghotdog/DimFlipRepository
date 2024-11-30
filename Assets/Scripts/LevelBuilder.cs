@@ -1,72 +1,50 @@
 using System.Collections;
 using System.Collections.Generic;
-using Unity.VisualScripting;
 using UnityEngine;
 
 public class LevelBuilder : MonoBehaviour
 {
     public GameObject emptyTemplate;
-    public GameObject blockTemplate;
-    public GameObject startTemplate;
-    public GameObject endTemplate;
-    public GameObject ladderTemplateRight;
-    public GameObject ladderTemplateLeft;
+
     public GameObject levelParent;
-    public GameObject leverTemplate;
+
     public int[,,] levelTemplate;
     public int currentLevel = 0;
+
     public Dictionary<int, GameObject> blockTemplates;
+
     public Dictionary<int, int> interActPairs;
+
     public Vector3 startBlockPosition;
 
-    void BuildDictionary()
+    public void BuildDictionary()
     {
-        blockTemplates = new Dictionary<int, GameObject>(){
-            {0, emptyTemplate},
-            {1, blockTemplate},
-            {2, startTemplate},
-            {3, endTemplate},
-            {4, ladderTemplateRight},
-            {5, ladderTemplateLeft},
-            {6, leverTemplate }
+        ThemeData theme = ThemeManager.Instance.currentTheme;
+
+        blockTemplates = new Dictionary<int, GameObject>()
+        {
+            {0, theme.emptyModel != null ? theme.emptyModel : emptyTemplate},
+            {1, theme.blockModel},
+            {2, theme.startModel},
+            {3, theme.endModel},
+            {4, theme.ladderModel}, //right
+            {5, theme.ladderModel}, //left
+            {6, theme.leverModel},
+            {7, theme.blockwlightModel}
         };
     }
 
-    public HashSet<string> GetUnsteppableBlocks() {
-        return new HashSet<string>() {
-            emptyTemplate.GetComponent<Block>().GetBlockType(),
-            ladderTemplateRight.GetComponent<Block>().GetBlockType(), 
-            ladderTemplateLeft.GetComponent<Block>().GetBlockType()
-        };
-    }
-
-    // Add more if new blocks are added that the player should not be inside
-    public HashSet<string> GetSteppableBlocks() {
-        return new HashSet<string>() {
-            blockTemplate.GetComponent<Block>().GetBlockType(),
-            startTemplate.GetComponent<Block>().GetBlockType(),
-            endTemplate.GetComponent<Block>().GetBlockType()
-        };
-    }
-
-    public List<GameObject> GetLadders() {
-        return new List<GameObject>() {
-            ladderTemplateRight, ladderTemplateLeft
-        };
-    }
-    
-    // Start is called before the first frame update
     public GameObject[,,] RemoteBuild()
     {
         BuildDictionary();
-        levelTemplate = null;   
-        switch(currentLevel)
+        levelTemplate = null;
+        switch (currentLevel)
         {
             case 0:
-                level9TemplateSetup();
+                level0TemplateSetup();
                 break;
-            case 1: 
-                level8TemplateSetup();
+            case 1:
+                level1TemplateSetup();
                 break;
             case 2:
                 level2TemplateSetup();
@@ -77,86 +55,88 @@ public class LevelBuilder : MonoBehaviour
             case 4:
                 level4TemplateSetup();
                 break;
+            // Add more cases for additional levels as needed
+            default:
+                Debug.LogWarning("LevelBuilder: No setup defined for currentLevel index.");
+                break;
         }
-        
+
         return buildLevel(levelParent.transform, levelTemplate);
     }
 
-    
-
-    void level0TemplateSetup(){
+    void level0TemplateSetup()
+    {
         levelTemplate = new int[,,] {
-            {{2},{0}},
-            {{1},{0}},
-            {{1},{0}},
-            {{1},{1}},
-            {{1},{0}},
-            {{3},{0}},
+            { {2}, {0} },
+            { {1}, {0} },
+            { {7}, {0} },
+            { {1}, {1} },
+            { {1}, {0} },
+            { {3}, {0} },
         };
-        //interActPairs = new Dictionary<int, int>();
-        //interActPairs.Add(100,2102); //Last digit refers block direction
-                                    //1=UP-DOWN, 2=DOWN-UP, 3=LEFT-RIGHT, 4=RIGHT-LEFT
-
+        // Uncomment and define interActPairs if needed
+        /*
+        interActPairs = new Dictionary<int, int>();
+        interActPairs.Add(100,2102); // Last digit refers to block direction
+                                        // 1=UP-DOWN, 2=DOWN-UP, 3=LEFT-RIGHT, 4=RIGHT-LEFT
+        */
     }
 
     void level1TemplateSetup()
     {
-        levelTemplate = new int[,,] { 
-                                    { { 2, 0, 3 }, { 0, 0, 0 } },
-                                    { { 1, 0, 1 }, { 0, 0, 4 } },
-                                    { { 1, 1, 0 }, { 0, 4, 1 } },
-                                    { { 1, 0, 0 }, { 0, 1, 1 } } 
-                                    };
+        levelTemplate = new int[,,] {
+            { { 2, 0, 3 }, { 0, 0, 0 } },
+            { { 1, 0, 1 }, { 0, 0, 4 } },
+            { { 1, 1, 0 }, { 0, 4, 1 } },
+            { { 1, 0, 0 }, { 0, 1, 1 } }
+        };
     }
 
-    
-
-    void level2TemplateSetup() 
+    void level2TemplateSetup()
     {
-        levelTemplate = new int[,,] { 
-                                    {{2,1,0,0}, {0,0,0,1}, {0,0,3,0}, {0,0,4,0}},
-                                    {{0,1,0,0}, {0,0,0,1}, {0,0,0,4}, {0,1,1,0}},
-                                    {{1,1,0,1}, {0,4,0,0}, {1,0,0,1}, {0,1,0,0}},
-                                    {{1,0,1,1}, {0,1,0,4}, {1,0,1,0}, {0,1,4,0}},
-                                    {{0,1,1,0}, {1,5,0,1}, {5,0,0,4}, {0,1,1,0}},
-                                    {{1,0,1,1}, {5,0,0,0}, {0,0,1,1}, {0,0,5,0}}
+        levelTemplate = new int[,,] {
+            { {2,1,0,0}, {0,0,0,1}, {0,0,3,0}, {0,0,4,0} },
+            { {0,1,0,0}, {0,0,0,1}, {0,0,0,4}, {0,1,1,0} },
+            { {1,1,0,1}, {0,4,0,0}, {1,0,0,1}, {0,1,0,0} },
+            { {1,0,1,1}, {0,1,0,4}, {1,0,1,0}, {0,1,4,0} },
+            { {0,1,1,0}, {1,5,0,1}, {5,0,0,4}, {0,1,1,0} },
+            { {1,0,1,1}, {5,0,0,0}, {0,0,1,1}, {0,0,5,0} }
         };
     }
 
     void level3TemplateSetup()
     {
         levelTemplate = new int[,,] {
-            {{2},{0}},
-            {{1},{0}},
-            {{6},{0}},
-            {{0},{1}},
-            {{1},{0}},
-            {{3},{0}},
+            { {2}, {0} },
+            { {1}, {0} },
+            { {6}, {0} },
+            { {0}, {1} },
+            { {1}, {0} },
+            { {3}, {0} },
         };
         interActPairs = new Dictionary<int, int>();
-        interActPairs.Add(200,3102); //Last digit refers block direction
-        //1=UP-DOWN, 2=DOWN-UP, 3=LEFT-RIGHT, 4=RIGHT-LEFT
+        interActPairs.Add(200, 3102); // Last digit refers to block direction
     }
 
     void level4TemplateSetup()
     {
         levelTemplate = new int[,,] {
-                                    { { 2, 0, 0, 0 }, { 0, 0, 6, 1 } },
-                                    { { 1, 0, 1, 0 }, { 0, 1, 5, 1 } },
-                                    { { 1, 1, 0, 0 }, { 0, 0, 0, 1 } },
-                                    { { 1, 0, 0, 0 }, { 0, 6, 0, 1 } },
-                                    { { 6, 0, 1, 0 }, { 0, 1, 4, 1 } },
-                                    { { 0, 0, 0, 0 }, { 1, 1, 1, 1 } },
-                                    { { 3, 0, 0, 0 }, { 0, 0, 0, 0 } }
-                                    };
+            { { 2, 0, 0, 0 }, { 0, 0, 6, 1 } },
+            { { 1, 0, 1, 0 }, { 0, 1, 5, 1 } },
+            { { 1, 1, 0, 0 }, { 0, 0, 0, 1 } },
+            { { 1, 0, 0, 0 }, { 0, 6, 0, 1 } },
+            { { 6, 0, 1, 0 }, { 0, 1, 4, 1 } },
+            { { 0, 0, 0, 0 }, { 1, 1, 1, 1 } },
+            { { 3, 0, 0, 0 }, { 0, 0, 0, 0 } }
+        };
         interActPairs = new Dictionary<int, int>();
         interActPairs.Add(400, 4112);
         interActPairs.Add(012, 2014);
         interActPairs.Add(311, 5102);
     }
 
-    /*
-          void level5TemplateSetup() //DONE
+
+    void level5TemplateSetup() // DONE
     {
         // Define the layout using a 3D array
         levelTemplate = new int[,,] {
@@ -175,49 +155,6 @@ public class LevelBuilder : MonoBehaviour
         interActPairs.Add(222, 3102);
     }
 
-    void level6TemplateSetup()
-    {
-        // Define the layout using a 3D array
-        levelTemplate = new int[,,] {
-            { { 2, 0, 0, 0, 0 }, { 0, 0, 0, 0, 0 }, { 0, 0, 0, 0, 0 } },
-            { { 1, 0, 0, 0, 0 }, { 0, 0, 0, 0, 0 }, { 0, 0, 0, 0, 0 } },
-            { { 1, 1, 1, 1, 1 }, { 0, 0, 0, 4, 0 }, { 0, 0, 0, 0, 0 } },
-            { { 1, 0, 1, 0, 0 }, { 0, 0, 4, 1, 1 }, { 0, 0, 0, 0, 0 } },
-            { { 0, 0, 0, 0, 0 }, { 0, 0, 1, 0, 1 }, { 0, 0, 0, 0, 0 } },
-            { { 1, 1, 1, 1, 1 }, { 0, 0, 0, 0, 5 }, { 0, 0, 0, 0, 0 } },
-            { { 0, 0, 0, 0, 0 }, { 0, 0, 0, 0, 0 }, { 0, 0, 0, 0, 0 } },
-            { { 0, 0, 0, 0, 0 }, { 0, 0, 0, 0, 0 }, { 0, 0, 0, 0, 0 } },
-
-        };
-        interActPairs = new Dictionary<int, int>();
-        interActPairs.Add(002, 0222);
-        interActPairs.Add(222, 3102);
-    }
-
-        void level7TemplateSetup()
-    {
-        // Define the layout using a 3D array
-        levelTemplate = new int[,,] {
-            { { 1, 1, 1, 2, 1, 1 }, { 0, 0, 0, 0, 0, 4 }, { 0, 0, 0, 0, 0, 0 } },
-            { { 1, 0, 0, 1, 0, 0 }, { 0, 0, 0, 0, 0, 1 }, { 0, 0, 0, 0, 0, 0 } },
-            { { 1, 0, 0, 1, 0, 0 }, { 0, 1, 0, 0, 0, 1 }, { 0, 0, 1, 1, 0, 0 } },
-            { { 0, 1, 0, 0, 0, 0 }, { 0, 6, 1, 1, 1, 1 }, { 0, 0, 5, 0, 0, 4 } },
-            { { 1, 1, 0, 1, 0, 0 }, { 0, 0, 0, 0, 0, 0 }, { 0, 0, 0, 1, 0, 1 } },
-            { { 1, 0, 0, 1, 1, 6 }, { 0, 0, 0, 0, 0, 0 }, { 0, 0, 0, 1, 1, 1 } },
-            { { 3, 0, 1, 1, 0, 0 }, { 0, 0, 0, 0, 0, 0 }, { 0, 0, 0, 0, 0, 0 } },
-
-        };
-        interActPairs = new Dictionary<int, int>();
-        interActPairs.Add(311, 3131);
-        interActPairs.Add(505, 2112);
-
-        //interActPairs.Add(002, 0222);
-        //interActPairs.Add(222, 3102);
-    }
-
-    
-     */
-
 
     void level8TemplateSetup()
     {
@@ -229,9 +166,9 @@ public class LevelBuilder : MonoBehaviour
             { { 0, 0, 0, 0, 0, 0 }, { 0, 1, 1, 1, 1, 1 }, { 0, 0, 0, 0, 0, 0 }, { 1, 0, 0, 6, 0, 1 } },
             { { 0, 0, 0, 0, 0, 0 }, { 0, 1, 1, 2, 1, 1 }, { 1, 0, 0, 0, 6, 1 }, { 5, 0, 0, 1, 0, 5 } },
             { { 6, 0, 0, 0, 0, 0 }, { 0, 1, 1, 1, 1, 1 }, { 1, 1, 1, 1, 0, 0 }, { 4, 0, 0, 5, 0, 0 } },
-            { { 1, 0, 0, 0, 0, 0 }, { 4, 1, 1, 1, 0, 1 }, { 0, 0, 0, 0, 0, 0 }, { 1, 1, 1, 1, 0, 0 } }, 
+            { { 1, 0, 0, 0, 0, 0 }, { 4, 1, 1, 1, 0, 1 }, { 0, 0, 0, 0, 0, 0 }, { 1, 1, 1, 1, 0, 0 } },
             { { 0, 1, 1, 1, 1, 1 }, { 1, 4, 1, 0, 3, 5 }, { 0, 0, 4, 0, 0, 0 }, { 1, 1, 0, 1, 0, 0 } },
-            { { 0, 0, 0, 0, 0, 0 }, { 1, 1, 0, 0, 0, 0 }, { 0, 0, 1, 1, 0, 0 }, { 0, 0, 0, 5, 0, 0 } }, 
+            { { 0, 0, 0, 0, 0, 0 }, { 1, 1, 0, 0, 0, 0 }, { 0, 0, 1, 1, 0, 0 }, { 0, 0, 0, 5, 0, 0 } },
         };
         interActPairs = new Dictionary<int, int>();
         interActPairs.Add(600, 9232);
@@ -248,8 +185,8 @@ public class LevelBuilder : MonoBehaviour
             { { 0, 0, 0, 0, 1}, { 0, 0, 2, 0, 4}, { 1, 0, 0, 0, 0 }, { 0, 1, 0, 0, 6 } },
             { { 0, 0, 1, 0, 0}, { 1, 1, 0, 0, 1}, { 5, 0, 0, 0, 0 }, { 0, 1, 6, 0, 0 } },
             { { 0, 0, 1, 0, 0}, { 1, 1, 0, 1, 1}, { 0, 4, 0, 0, 4 }, { 0, 0, 0, 1, 0 } },
-            { { 0, 0, 1, 0, 0}, { 0, 0, 0, 0, 0}, { 1, 1, 0, 0, 1 }, { 4, 0, 0, 1, 0 } },
-            { { 0, 0, 0, 0, 0}, { 0, 0, 3, 0, 0}, { 0, 0, 0, 1, 1 }, { 1, 1, 1, 5, 0 } },
+            { { 0, 0, 1, 0, 0}, { 0, 0, 0, 0, 0 }, { 1, 1, 0, 0, 1 }, { 4, 0, 0, 1, 0 } },
+            { { 0, 0, 0, 0, 0}, { 0, 0, 3, 0, 0 }, { 0, 0, 0, 1, 1 }, { 1, 1, 1, 5, 0 } },
         };
         interActPairs = new Dictionary<int, int>();
         interActPairs.Add(334, 4021);
@@ -257,10 +194,15 @@ public class LevelBuilder : MonoBehaviour
         interActPairs.Add(110, 6021);
     }
 
-    // Parent will act as position 0,0,0 for x,y,z coordinates. 
-    // lt[0][0][0] will be exactly at parent position
+
     public GameObject[,,] buildLevel(Transform parent, int[,,] lt)
     {
+        if (lt == null)
+        {
+            Debug.LogError("LevelBuilder: Level template is null.");
+            return null;
+        }
+
         GameObject[,,] level = new GameObject[lt.GetLength(0), lt.GetLength(1), lt.GetLength(2)];
         for (int i = 0; i < lt.GetLength(0); i++)
         {
@@ -268,13 +210,43 @@ public class LevelBuilder : MonoBehaviour
             {
                 for (int j = 0; j < lt.GetLength(2); j++)
                 {
+                    int blockID = lt[i, k, j];
+
+                    // Check if the blockID exists in the dictionary
+                    if (!blockTemplates.ContainsKey(blockID))
+                    {
+                        Debug.LogWarning($"LevelBuilder: Block ID {blockID} not found in blockTemplates.");
+                        continue;
+                    }
+
+                    GameObject blockPrefab = blockTemplates[blockID];
+
                     // Instantiate the block
-                    GameObject block = Instantiate(blockTemplates[lt[i, k, j]], parent);
+                    GameObject block = Instantiate(blockPrefab, parent);
                     block.transform.position = new Vector3(i, k, j);
                     level[i, k, j] = block;
 
+                    // Rotate the ladder if necessary
+                    if (blockID == 5) // Ladder to the left
+                    {
+                        block.transform.Rotate(0, 180, 0);
+                    }
+                    // No rotation needed for blockID == 4 (Ladder to the right)
+
+                    // Set the blockType
+                    Block blockComponent = block.GetComponent<Block>();
+                    if (blockComponent != null)
+                    {
+                        blockComponent.blockType = GetBlockTypeFromID(blockID);
+                        blockComponent.ApplyTheme(); // Apply the theme after setting blockType
+                    }
+                    else
+                    {
+                        Debug.LogWarning($"LevelBuilder: No Block component found on prefab for Block ID {blockID}.");
+                    }
+
                     // Check if the block is the startTemplate
-                    if (lt[i, k, j] == 2) // Assuming 2 corresponds to startTemplate
+                    if (blockID == 2) // Assuming 2 corresponds to startTemplate
                     {
                         startBlockPosition = new Vector3(i, k, j);
                     }
@@ -284,5 +256,39 @@ public class LevelBuilder : MonoBehaviour
         return level;
     }
 
+    private string GetBlockTypeFromID(int id)
+    {
+        switch (id)
+        {
+            case 0:
+                return "empty";
+            case 1:
+                return "block";
+            case 2:
+                return "start";
+            case 3:
+                return "end";
+            case 4:
+                return "right ladder";
+            case 5:
+                return "left ladder";
+            case 6:
+                return "lever";
+            case 7:
+                return "blockwlight";
+            default:
+                return "unknown";
+        }
+    }
 
+    public HashSet<string> GetUnsteppableBlocks()
+    {
+        return new HashSet<string>()
+        {
+            "empty",
+            "right ladder",
+            "left ladder"
+        };
+    }
 }
+

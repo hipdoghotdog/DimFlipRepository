@@ -1,49 +1,173 @@
-using System;
 using System.Collections;
 using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
-using UnityEngine.UI;
 
 public class ArtifactManager : MonoBehaviour
 {
+    // **Artifact Movement Variables**
+    [Header("Movement Settings")]
+    public Transform followPos;       
+    public Vector3 offset = Vector3.zero; 
+    public float speed = 5f;         
 
-    public Transform followPos;
-    public Vector3 offset;
-    public float speed;
+    [Header("Text Display Settings")]
+    public float displayDuration = 3f; 
 
-    private bool displayActive = false;
-    private float displayCountdown = 0;
+    private bool displayActive = false; 
+    private float displayCountdown = 0f; 
+    private TextMesh tm;                
 
-    private TextMesh tm;
-    // Make some TMPro magic i guess
+    // **Light Component Variables**
+    [Header("Light Settings")]
+    public LightType lightType = LightType.Point; 
+    public Color lightColor = Color.white;        
+    public float lightIntensity = 1f;             
+    public float lightRange = 10f;                
+    public bool enableShadows = false;            
 
-    void Start() {
-        tm = gameObject.GetComponentInChildren<TextMesh>();
+    [Header("Dynamic Light Effects")]
+    public bool enablePulsing = true;            
+    public float pulseSpeed = 2f;                 
+    public float pulseIntensityMin = 0.5f;        
+    public float pulseIntensityMax = 2f;          
+
+    private Light artifactLight; 
+
+    void Start()
+    {
+        tm = GetComponentInChildren<TextMesh>();
+        if (tm == null)
+        {
+            Debug.LogError("TextMesh component not found in children of Artifact.");
+        }
+
+        artifactLight = GetComponent<Light>();
+        if (artifactLight == null)
+        {
+            artifactLight = gameObject.AddComponent<Light>();
+        }
+
+        artifactLight.type = lightType;
+        artifactLight.color = lightColor;
+        artifactLight.intensity = lightIntensity;
+        artifactLight.range = lightRange;
+        artifactLight.shadows = enableShadows ? LightShadows.Soft : LightShadows.None;
+
+        if (artifactLight.type == LightType.Spot)
+        {
+            artifactLight.spotAngle = 30f; 
+        }
     }
 
-    // Update is called once per frame
     void Update()
     {
-        Vector3 preciseFollowPos = followPos.position + offset;
-        transform.position = Vector3.MoveTowards(transform.position, preciseFollowPos, speed*Time.deltaTime);   
+        // **Handle Artifact Movement**
+        FollowPlayer();
 
-        if(displayActive) {
+        // **Handle Text Display Countdown**
+        HandleTextDisplay();
+
+        // **Handle Dynamic Light Effects**
+        if (enablePulsing)
+        {
+            PulseLight();
+        }
+    }
+
+    private void FollowPlayer()
+    {
+        if (followPos != null)
+        {
+            Vector3 targetPosition = followPos.position + offset;
+            transform.position = Vector3.MoveTowards(transform.position, targetPosition, speed * Time.deltaTime);
+        }
+        else
+        {
+            Debug.LogWarning("Follow Position is not assigned in ArtifactManager.");
+        }
+    }
+
+    private void HandleTextDisplay()
+    {
+        if (displayActive)
+        {
             displayCountdown -= Time.deltaTime;
-            if(displayCountdown <= 0) {
+            if (displayCountdown <= 0f)
+            {
                 displayActive = false;
-                displayCountdown = 0;
-                tm.text = "";
+                displayCountdown = 0f;
+                if (tm != null)
+                {
+                    tm.text = "";
+                }
             }
         }
     }
 
-    // Will display text and remove it after a few seconds
-    public void DisplayText(string text){
-        displayActive = true;
-        displayCountdown = 3f;
-        tm.text = text;
+    public void DisplayText(string text)
+    {
+        if (tm != null)
+        {
+            displayActive = true;
+            displayCountdown = displayDuration;
+            tm.text = text;
+        }
+        else
+        {
+            Debug.LogWarning("TextMesh component is not assigned.");
+        }
     }
 
-    
+    private void PulseLight()
+    {
+        if (artifactLight != null)
+        {
+            // Calculate pulsing intensity using PingPong for smooth oscillation
+            float pulsingIntensity = Mathf.PingPong(Time.time * pulseSpeed, pulseIntensityMax - pulseIntensityMin) + pulseIntensityMin;
+            artifactLight.intensity = pulsingIntensity;
+        }
+    }
+
+    #region Optional Light Control Methods
+
+    public void SetLightColor(Color newColor)
+    {
+        if (artifactLight != null)
+        {
+            artifactLight.color = newColor;
+        }
+    }
+
+    public void SetLightIntensity(float newIntensity)
+    {
+        if (artifactLight != null)
+        {
+            lightIntensity = newIntensity;
+            artifactLight.intensity = newIntensity;
+        }
+    }
+
+    public void ToggleLight(bool isOn)
+    {
+        if (artifactLight != null)
+        {
+            artifactLight.enabled = isOn;
+        }
+    }
+
+    public void ChangeLightType(LightType newType)
+    {
+        if (artifactLight != null)
+        {
+            artifactLight.type = newType;
+            // Optional: Adjust additional properties based on light type
+            if (newType == LightType.Spot)
+            {
+                artifactLight.spotAngle = 30f; // Example value
+            }
+        }
+    }
+
+    #endregion
 }
