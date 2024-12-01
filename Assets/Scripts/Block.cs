@@ -8,11 +8,23 @@ public class Block : MonoBehaviour
     private MeshRenderer meshRenderer;
     public string blockType;
 
+    // New properties
+    public bool isPushable = false;
+    public bool isPullable = false;
+
     void Start()
     {
         blockAnim = GetComponent<Animator>();
         meshRenderer = GetComponent<MeshRenderer>();
         ApplyTheme();
+
+        // Initialize pushable and pullable based on blockType
+        switch (blockType.ToLower())
+        {
+            case "pushable":
+                isPushable = true;
+                break;
+        }
     }
 
     public void ApplyTheme()
@@ -40,7 +52,9 @@ public class Block : MonoBehaviour
                 case "left ladder":
                     meshRenderer.material = theme.ladderMaterial;
                     break;
-           
+                case "pushable":
+                    meshRenderer.material = theme.pushableMaterial;
+                    break;
                 default:
                     Debug.LogWarning($"Block: Unknown blockType '{blockType}'. No material applied.");
                     break;
@@ -65,7 +79,6 @@ public class Block : MonoBehaviour
         }
         switchOn = state;
     }
-
 
     public string GetBlockType()
     {

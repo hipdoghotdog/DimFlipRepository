@@ -30,7 +30,8 @@ public class LevelBuilder : MonoBehaviour
             {4, theme.ladderModel}, //right
             {5, theme.ladderModel}, //left
             {6, theme.leverModel},
-            {7, theme.blockwlightModel}
+            {7, theme.blockwlightModel},
+            {8, theme.pushableModel},
         };
     }
 
@@ -54,6 +55,9 @@ public class LevelBuilder : MonoBehaviour
                 break;
             case 4:
                 level4TemplateSetup();
+                break;
+            case 5:
+                level5TemplateSetup();
                 break;
             // Add more cases for additional levels as needed
             default:
@@ -135,8 +139,21 @@ public class LevelBuilder : MonoBehaviour
         interActPairs.Add(311, 5102);
     }
 
+    void level5TemplateSetup()
+    {
+        levelTemplate = new int[,,] {
+            { { 2, 0, 0 }, { 0, 0, 0 } },
+            { { 1, 0, 0 }, { 0, 0, 0 } },
+            { { 1, 1, 0 }, { 4, 0, 0 } },
+            { { 1, 1, 0 }, { 0, 1, 1 } },
+            { { 1, 1, 0 }, { 8, 0, 1 } },
+            { { 1, 1, 0 }, { 0, 0, 1 } },
+            { { 0, 0, 0 }, { 3, 1, 1 } },
+        };
+    }
 
-    void level5TemplateSetup() // DONE
+
+    void level11TemplateSetup() // DONE
     {
         // Define the layout using a 3D array
         levelTemplate = new int[,,] {
@@ -276,6 +293,8 @@ public class LevelBuilder : MonoBehaviour
                 return "lever";
             case 7:
                 return "blockwlight";
+            case 8:
+                return "pushable"; 
             default:
                 return "unknown";
         }

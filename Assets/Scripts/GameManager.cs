@@ -95,7 +95,7 @@ public class GameManager : MonoBehaviour
         // Handle reset position
         if (Input.GetKeyDown(KeyCode.Backspace))
         {
-            pm.ResetPlayerPosition();
+            on_next_level(lb.currentLevel - 1); //reload current level
         }
 
         // Flip level
@@ -108,7 +108,7 @@ public class GameManager : MonoBehaviour
     public void on_next_level(int level)
     {
 
-        if (level == 4)
+        if (level == 5)
         {
             endScene.SetActive(true);
         }
@@ -136,6 +136,9 @@ public class GameManager : MonoBehaviour
                 break;
             case 4:
                 am.DisplayText("Hmm, this looks challenging. There must be a catch to get through this.");
+                break;
+            case 5:
+                am.DisplayText("Try to push the wooden crate. Remember you can reset with 'Backspace'");
                 break;
         }
     }
