@@ -168,6 +168,7 @@ public class PlayerMovement : MonoBehaviour
                         if (targetBlock == null || targetBlock.blockType.ToLower() == "empty")
                         {
                             // Move the blocks
+                            playerAnimator.SetTrigger("Push");
                             MoveBlock(blockAtToPosSame, pushBlockTargetPos);
                             MoveBlock(targetBlock, blockPosition);
 
@@ -183,7 +184,7 @@ public class PlayerMovement : MonoBehaviour
 
                             // Move the player to the position of the block
                             newPosition += new Vector3(xIncrement, 0, 0);
-                            StartMovement(newPosition, desiredRotation);
+                            StartMovement(newPosition, desiredRotation, false, false);
                             return true;
                         }
                     }
@@ -231,7 +232,7 @@ public class PlayerMovement : MonoBehaviour
         }
         return false;
     }
-    void StartMovement(Vector3 newPosition, Quaternion desiredRotation, bool isDownwardLadderMovement = false)
+    void StartMovement(Vector3 newPosition, Quaternion desiredRotation, bool isDownwardLadderMovement = false, bool activateWalkingAni = true)
     {
         if (isDownwardLadderMovement)
         {
@@ -253,7 +254,8 @@ public class PlayerMovement : MonoBehaviour
 
             targetPosition = movementQueue.Dequeue();
             isMoving = true;
-            playerAnimator.SetBool("isWalking", true);
+            playerAnimator.SetBool("isWalking", activateWalkingAni);
+
         }
         else
         {
@@ -262,7 +264,7 @@ public class PlayerMovement : MonoBehaviour
 
             targetPosition = movementQueue.Dequeue();
             isMoving = true;
-            playerAnimator.SetBool("isWalking", true);
+            playerAnimator.SetBool("isWalking", activateWalkingAni);
         }
 
         // Handle rotation

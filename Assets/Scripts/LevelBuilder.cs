@@ -42,7 +42,7 @@ public class LevelBuilder : MonoBehaviour
         switch (currentLevel)
         {
             case 0:
-                level0TemplateSetup();
+                level5TemplateSetup();
                 break;
             case 1:
                 level1TemplateSetup();
