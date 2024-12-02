@@ -167,8 +167,11 @@ public class PlayerMovement : MonoBehaviour
 
                         if (targetBlock == null || targetBlock.blockType.ToLower() == "empty")
                         {
-                            // Move the blocks
+                            //
                             playerAnimator.SetTrigger("Push");
+                            SoundManager.instance.PlaySound(Sound.PUSH);
+
+                            // Move the blocks
                             MoveBlock(blockAtToPosSame, pushBlockTargetPos);
                             MoveBlock(targetBlock, blockPosition);
 

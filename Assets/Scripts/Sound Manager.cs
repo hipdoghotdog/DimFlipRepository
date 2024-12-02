@@ -5,6 +5,7 @@ using UnityEngine;
 public enum Sound {
     STEP,
     LEVER,
+    PUSH,
 }
 
 public class SoundManager : MonoBehaviour
@@ -34,6 +35,9 @@ public class SoundManager : MonoBehaviour
                 break;
             case Sound.LEVER:
                 au.PlayOneShot(audioClips[3]);
+                break;
+            case Sound.PUSH:
+                au.PlayOneShot(audioClips[4]);
                 break;
         }
     }
