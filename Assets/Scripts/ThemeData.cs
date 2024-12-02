@@ -8,6 +8,7 @@ public class ThemeData : ScriptableObject
     public Material endMaterial;
     public Material ladderMaterial;
     public Material leverMaterial;
+    public Material pushableMaterial;
 
     public GameObject blockModel;
     public GameObject emptyModel;
@@ -16,4 +17,5 @@ public class ThemeData : ScriptableObject
     public GameObject ladderModel;
     public GameObject leverModel;
     public GameObject blockwlightModel;
+    public GameObject pushableModel;
 }

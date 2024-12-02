@@ -1,3 +1,4 @@
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using static GameManager;
@@ -41,6 +42,9 @@ public class PlayerMovement : MonoBehaviour
         {
             MovePlayer();
         }
+
+
+        //Debug.LogWarning($"");
     }
 
     public bool CanIStepOnBlock(Vector3 position)
@@ -127,14 +131,91 @@ public class PlayerMovement : MonoBehaviour
             StartMovement(newPosition, desiredRotation, isDownwardLadderMovement: true); // Moving down
             return true;
         }
-        // Regular horizontal movement
-        else if (CanIStepOnBlock(toPosSame) && (currentPosition.y == maxY || !CanIStepOnBlock(toPosSame + Vector3.up)))
+        // Regular horizontal movement or pushing a block
+        else
         {
-            newPosition += new Vector3(xIncrement, 0, 0);
-            StartMovement(newPosition, desiredRotation);
-            return true;
+            // Check if the target position is steppable
+            if (CanIStepOnBlock(toPosSame) && (currentPosition.y == maxY || !CanIStepOnBlock(toPosSame + Vector3.up)))
+            {
+                newPosition += new Vector3(xIncrement, 0, 0);
+                StartMovement(newPosition, desiredRotation);
+                return true;
+            }
+            else
+            {
+                // Retrieve the block at the same horizontal position but one layer up
+                Vector3 blockPosition = toPosSame + Vector3.up;
+                Block blockAtToPosSame = gameManager.GetBlock(blockPosition);
+
+                // Check if the block is pushable and on the correct level
+                if (blockAtToPosSame != null && blockAtToPosSame.isPushable && Mathf.Approximately(blockAtToPosSame.transform.position.y, currentPosition.y + 1))
+                {
+                    // Calculate the position ahead of the pushable block
+                    Vector3 pushBlockTargetPos = blockPosition + new Vector3(xIncrement, 0, 0); // Maintain the y-offset
+
+                    // Check if the position ahead is within bounds
+                    int maxX = gameManager.current_level.GetLength(0) - 1;
+                    int maxZ = gameManager.current_level.GetLength(2) - 1;
+                    maxY = gameManager.current_level.GetLength(1) - 1;
+
+                    if (pushBlockTargetPos.x >= 0 && pushBlockTargetPos.x <= maxX &&
+                        pushBlockTargetPos.z >= 0 && pushBlockTargetPos.z <= maxZ &&
+                        pushBlockTargetPos.y >= 0 && pushBlockTargetPos.y <= maxY)
+                    {
+                        // Check if the block at the target position is null or empty
+                        Block targetBlock = gameManager.GetBlock(pushBlockTargetPos);
+
+                        if (targetBlock == null || targetBlock.blockType.ToLower() == "empty")
+                        {
+                            //
+                            playerAnimator.SetTrigger("Push");
+                            SoundManager.instance.PlaySound(Sound.PUSH);
+
+                            // Move the blocks
+                            MoveBlock(blockAtToPosSame, pushBlockTargetPos);
+                            MoveBlock(targetBlock, blockPosition);
+
+
+                            // Update the level array
+                            GameObject temp = gameManager.current_level[(int)pushBlockTargetPos.x, (int)pushBlockTargetPos.y, (int)pushBlockTargetPos.z];
+                            
+                            gameManager.current_level[(int)pushBlockTargetPos.x, (int)pushBlockTargetPos.y, (int)pushBlockTargetPos.z] =
+                                gameManager.current_level[(int)blockPosition.x, (int)blockPosition.y, (int)blockPosition.z];
+
+                            gameManager.current_level[(int)blockPosition.x, (int)blockPosition.y, (int)blockPosition.z] = temp;
+
+
+                            // Move the player to the position of the block
+                            newPosition += new Vector3(xIncrement, 0, 0);
+                            StartMovement(newPosition, desiredRotation, false, false);
+                            return true;
+                        }
+                    }
+                }
+            }
         }
         return false;
+    }
+
+    IEnumerator MoveBlockCoroutine(Block block, Vector3 targetPosition)
+    {
+        float duration = 0.2f; // Duration of the movement
+        float elapsed = 0f;
+        Vector3 initialPosition = block.transform.position;
+
+        while (elapsed < duration)
+        {
+            block.transform.position = Vector3.Lerp(initialPosition, targetPosition, elapsed / duration);
+            elapsed += Time.deltaTime;
+            yield return null;
+        }
+
+        block.transform.position = targetPosition;
+    }
+
+    void MoveBlock(Block block, Vector3 newPosition)
+    {
+        StartCoroutine(MoveBlockCoroutine(block, newPosition));
     }
 
     bool TryMoveVertical(int zIncrement, Quaternion desiredRotation)
@@ -154,7 +235,7 @@ public class PlayerMovement : MonoBehaviour
         }
         return false;
     }
-    void StartMovement(Vector3 newPosition, Quaternion desiredRotation, bool isDownwardLadderMovement = false)
+    void StartMovement(Vector3 newPosition, Quaternion desiredRotation, bool isDownwardLadderMovement = false, bool activateWalkingAni = true)
     {
         if (isDownwardLadderMovement)
         {
@@ -176,7 +257,8 @@ public class PlayerMovement : MonoBehaviour
 
             targetPosition = movementQueue.Dequeue();
             isMoving = true;
-            playerAnimator.SetBool("isWalking", true);
+            playerAnimator.SetBool("isWalking", activateWalkingAni);
+
         }
         else
         {
@@ -185,7 +267,7 @@ public class PlayerMovement : MonoBehaviour
 
             targetPosition = movementQueue.Dequeue();
             isMoving = true;
-            playerAnimator.SetBool("isWalking", true);
+            playerAnimator.SetBool("isWalking", activateWalkingAni);
         }
 
         // Handle rotation
