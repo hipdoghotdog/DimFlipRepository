@@ -12,7 +12,7 @@ public class ArtifactManager : MonoBehaviour
     public float speed = 5f;         
 
     [Header("Text Display Settings")]
-    public float displayDuration = 3f; 
+    public float displayDuration = 5f; 
 
     private bool displayActive = false; 
     private float displayCountdown = 0f; 
@@ -33,6 +33,8 @@ public class ArtifactManager : MonoBehaviour
     public float pulseIntensityMax = 2f;          
 
     private Light artifactLight; 
+
+    public Transform camToLookAt;
 
     void Start()
     {
@@ -58,6 +60,8 @@ public class ArtifactManager : MonoBehaviour
         {
             artifactLight.spotAngle = 30f; 
         }
+
+        camToLookAt = GameObject.Find("Camera").transform; // If camera object is renamed, this breaks
     }
 
     void Update()
@@ -67,6 +71,9 @@ public class ArtifactManager : MonoBehaviour
 
         // **Handle Text Display Countdown**
         HandleTextDisplay();
+
+        // **Make Text Look On Camera
+        tm.transform.rotation = Quaternion.LookRotation(camToLookAt.forward);
 
         // **Handle Dynamic Light Effects**
         if (enablePulsing)
@@ -112,6 +119,7 @@ public class ArtifactManager : MonoBehaviour
             displayActive = true;
             displayCountdown = displayDuration;
             tm.text = text;
+            SoundManager.instance.PlaySound(Sound.ARTIFACT_TALK, 0.3f);
         }
         else
         {
