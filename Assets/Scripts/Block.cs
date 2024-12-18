@@ -14,14 +14,41 @@ public class Block : MonoBehaviour
     public bool isPushable = false;
     public bool isPullable = false;
 
-    private void Start()
+    // Reference to the Indicator (only for levers)
+    public GameObject indicator; // Assign in the Inspector for levers only
+    private MeshRenderer indicatorRenderer;
+
+    void Start()
     {
         _blockAnim = GetComponent<Animator>();
         _meshRenderer = GetComponent<MeshRenderer>();
         ApplyTheme();
 
         // Initialize pushable and pullable based on blockType
-        if (blockType.ToLower() == "pushable") isPushable = true;
+        switch (blockType.ToLower())
+        {
+            case "pushable":
+                isPushable = true;
+                break;
+            case "lever":
+                isPullable = true;
+                break;
+                // Add other block types if necessary
+        }
+
+        // Initialize Indicator only for levers
+        if (blockType.ToLower() == "lever")
+        {
+            if (indicator != null)
+            {
+                indicatorRenderer = indicator.GetComponent<MeshRenderer>();
+                UpdateIndicatorColor();
+            }
+            else
+            {
+                Debug.LogWarning("Indicator GameObject is not assigned in the Block script for a lever block.");
+            }
+        }
     }
 
     public void ApplyTheme()
@@ -66,6 +93,12 @@ public class Block : MonoBehaviour
             _blockAnim.SetBool(IsActive, state);
         }
         isActive = state;
+
+        // Update indicator visibility only for levers
+        if (blockType.ToLower() == "lever" && indicator != null)
+        {
+            indicator.SetActive(state);
+        }
     }
 
     public virtual void Pull(bool state)
@@ -75,6 +108,21 @@ public class Block : MonoBehaviour
             _blockAnim.SetBool(SwitchOn, state);
         }
         switchOn = state;
+
+        // Update indicator color only for levers
+        if (blockType.ToLower() == "lever" && indicatorRenderer != null)
+        {
+            UpdateIndicatorColor();
+        }
+    }
+
+    private void UpdateIndicatorColor()
+    {
+        if (indicatorRenderer != null)
+        {
+            Color color = switchOn ? Color.green : Color.red;
+            indicatorRenderer.material.SetColor("_EmissionColor", color * 2f); // Ensure emission is visible
+        }
     }
 
     public string GetBlockType()
