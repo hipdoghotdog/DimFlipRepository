@@ -4,7 +4,7 @@ using UnityEngine;
 public class LeverInteractionScript : MonoBehaviour
 {
     public Animator playerAnimator;      // Assign this in the Inspector
-    public float leverAnimationDuration = 0.6f;
+    public float leverAnimationDuration = 0.2f;
 
     private bool isInteracting = false;
     private GameManager gameManager;

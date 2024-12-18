@@ -6,6 +6,8 @@ using UnityEngine.SceneManagement;
 
 public class GameManager : MonoBehaviour
 {
+    public int STARTLEVEL = 7;
+
     public LevelBuilder lb;
     public LevelFlipper lf;
     public GameObject player;
@@ -38,7 +40,7 @@ public class GameManager : MonoBehaviour
 
         cameraScript = cam.GetComponent<CameraScript>();
 
-        load_new_level(0);
+        load_new_level(STARTLEVEL);
 
         pm = player.GetComponent<PlayerMovement>();
         pm.ResetPlayerPosition();
