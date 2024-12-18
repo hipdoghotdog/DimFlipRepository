@@ -197,25 +197,9 @@ public class PlayerMovement : MonoBehaviour
         return false;
     }
 
-    IEnumerator MoveBlockCoroutine(Block block, Vector3 targetPosition)
+    public void MoveBlock(Block block, Vector3 newPosition)
     {
-        float duration = 0.2f; // Duration of the movement
-        float elapsed = 0f;
-        Vector3 initialPosition = block.transform.position;
-
-        while (elapsed < duration)
-        {
-            block.transform.position = Vector3.Lerp(initialPosition, targetPosition, elapsed / duration);
-            elapsed += Time.deltaTime;
-            yield return null;
-        }
-
-        block.transform.position = targetPosition;
-    }
-
-    void MoveBlock(Block block, Vector3 newPosition)
-    {
-        StartCoroutine(MoveBlockCoroutine(block, newPosition));
+        StartCoroutine(gameManager.MoveBlockCoroutine(block, newPosition));
     }
 
     bool TryMoveVertical(int zIncrement, Quaternion desiredRotation)
@@ -311,7 +295,11 @@ public class PlayerMovement : MonoBehaviour
                 {
                     gameManager.on_next_level(gameManager.lb.currentLevel);
                 }
+
+                // After the player stops moving, apply gravity to blocks
+                gameManager.CheckGravity();
             }
+
         }
     }
 
