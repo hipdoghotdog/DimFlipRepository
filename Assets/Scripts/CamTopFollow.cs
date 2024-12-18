@@ -7,9 +7,9 @@ public class CamTopFollow : MonoBehaviour
 
     // Start is called before the first frame update
     public Transform target;
-    Vector3 offset = new  Vector3(0, 10, 0);
+    private readonly Vector3 _offset = new(0, 10, 0);
     private void FixedUpdate()
     {
-        transform.position = target.position + offset;
+        transform.position = target.position + _offset;
     }
 }

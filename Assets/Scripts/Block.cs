@@ -2,80 +2,77 @@ using UnityEngine;
 
 public class Block : MonoBehaviour
 {
+    private static readonly int IsActive = Animator.StringToHash("isActive");
+    private static readonly int SwitchOn = Animator.StringToHash("switchOn");
     public bool switchOn = false;
     public bool isActive = true;
-    private Animator blockAnim;
-    private MeshRenderer meshRenderer;
+    private Animator _blockAnim;
+    private MeshRenderer _meshRenderer;
     public string blockType;
 
     // New properties
     public bool isPushable = false;
     public bool isPullable = false;
 
-    void Start()
+    private void Start()
     {
-        blockAnim = GetComponent<Animator>();
-        meshRenderer = GetComponent<MeshRenderer>();
+        _blockAnim = GetComponent<Animator>();
+        _meshRenderer = GetComponent<MeshRenderer>();
         ApplyTheme();
 
         // Initialize pushable and pullable based on blockType
-        switch (blockType.ToLower())
-        {
-            case "pushable":
-                isPushable = true;
-                break;
-        }
+        if (blockType.ToLower() == "pushable") isPushable = true;
     }
 
     public void ApplyTheme()
     {
         ThemeData theme = ThemeManager.Instance.currentTheme;
-        if (theme != null && meshRenderer != null)
+        
+        if (theme == null || _meshRenderer == null) return;
+        
+        switch (blockType.ToLower())
         {
-            switch (blockType.ToLower())
-            {
-                case "block":
-                case "blockwlight":
-                case "lever":
-                    meshRenderer.material = theme.blockMaterial;
-                    break;
-                case "empty":
-                    meshRenderer.material = null;
-                    break;
-                case "start":
-                    meshRenderer.material = theme.startMaterial;
-                    break;
-                case "end":
-                    meshRenderer.material = theme.endMaterial;
-                    break;
-                case "right ladder":
-                case "left ladder":
-                    meshRenderer.material = theme.ladderMaterial;
-                    break;
-                case "pushable":
-                    meshRenderer.material = theme.pushableMaterial;
-                    break;
-                default:
-                    Debug.LogWarning($"Block: Unknown blockType '{blockType}'. No material applied.");
-                    break;
-            }
+            case "block":
+            case "blockwlight":
+            case "lever":
+                _meshRenderer.material = theme.blockMaterial;
+                break;
+            case "empty":
+                _meshRenderer.material = null;
+                break;
+            case "start":
+                _meshRenderer.material = theme.startMaterial;
+                break;
+            case "end":
+                _meshRenderer.material = theme.endMaterial;
+                break;
+            case "right ladder":
+            case "left ladder":
+                _meshRenderer.material = theme.ladderMaterial;
+                break;
+            case "pushable":
+                _meshRenderer.material = theme.pushableMaterial;
+                break;
+            default:
+                Debug.LogWarning($"Block: Unknown blockType '{blockType}'. No material applied.");
+                break;
         }
     }
 
     public virtual void Activate(bool state)
     {
-        if (blockAnim != null)
+        if (_blockAnim != null)
         {
-            blockAnim.SetBool("isActive", state);
+            _blockAnim.SetBool(IsActive, state);
         }
         isActive = state;
     }
 
     public virtual void Pull(bool state)
     {
-        if (blockAnim != null)
+        if (_blockAnim != null)
         {
-            blockAnim.SetBool("switchOn", state);
+            _blockAnim.SetBool(SwitchOn, state);
         }
         switchOn = state;
     }
