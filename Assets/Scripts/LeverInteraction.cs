@@ -1,128 +1,135 @@
 using System.Collections;
 using UnityEngine;
+using UnityEngine.SocialPlatforms.GameCenter;
 
 public class LeverInteractionScript : MonoBehaviour
 {
     public Animator playerAnimator;      // Assign this in the Inspector
     public float leverAnimationDuration = 0.2f;
 
-    private bool isInteracting = false;
-    private GameManager gameManager;
+    private bool _isInteracting;
+    private GameManager _gameManager;
 
-    void Start()
+    private void Start()
     {
         // Find the GameManager in the scene
-        gameManager = FindObjectOfType<GameManager>();
-        if (gameManager == null)
+        _gameManager = FindObjectOfType<GameManager>();
+        if (_gameManager == null)
         {
             Debug.LogError("GameManager not found in the scene.");
         }
 
         // Ensure playerAnimator is assigned
+        if (playerAnimator != null) return;
+        
+        playerAnimator = GetComponent<Animator>();
         if (playerAnimator == null)
         {
-            playerAnimator = GetComponent<Animator>();
-            if (playerAnimator == null)
-            {
-                Debug.LogError("Animator component not found on the player.");
-            }
+            Debug.LogError("Animator component not found on the player.");
         }
     }
 
-    void Update()
+    private void Update()
     {
         HandleLeverInput();
     }
 
-    void HandleLeverInput()
+    private Block GetBlock(Vector3 position)
+    {
+        return _gameManager.CurrentLevel[(int)position.x, (int)position.y, (int)position.z].GetComponent<Block>();
+    }
+
+    private void HandleLeverInput()
     {
         if (Input.GetKeyDown(KeyCode.E))
         {
-            Vector3 pp = transform.position;
+            Vector3 playerPosition = transform.position;
 
             // Assuming GameManager has a method to get the block at a position
-            if (gameManager.GetBlock(pp).GetBlockType() == "lever")
+            if (GetBlock(playerPosition).GetBlockType() == "lever")
             {
-                HandleLeverInteraction(pp);
+                HandleLeverInteraction(playerPosition);
             }
         }
     }
 
-    void HandleLeverInteraction(Vector3 pp)
+    private void HandleLeverInteraction(Vector3 playerPosition)
     {
-        if (isInteracting) return;
-        StartCoroutine(HandleLeverInteractionCoroutine(pp));
+        if (_isInteracting) return;
+        StartCoroutine(HandleLeverInteractionCoroutine(playerPosition));
     }
 
-    IEnumerator HandleLeverInteractionCoroutine(Vector3 pp)
+    private IEnumerator HandleLeverInteractionCoroutine(Vector3 playerPosition)
     {
-        isInteracting = true;
+        _isInteracting = true;
 
         // Trigger the player animation
         playerAnimator.SetTrigger("Pull");
 
         yield return new WaitForSeconds(leverAnimationDuration);
 
-        ApplyLeverEffects(pp);
+        ApplyLeverEffects(playerPosition);
 
-        isInteracting = false;
+        _isInteracting = false;
     }
 
-    void ApplyLeverEffects(Vector3 pp)
+    private void ApplyLeverEffects(Vector3 playerPosition)
     {
         // Toggle the lever state
-        bool state = !gameManager.GetBlock(pp).switchOn;
-        gameManager.GetBlock(pp).Pull(state);
+        bool state = !GetBlock(playerPosition).switchOn;
+        GetBlock(playerPosition).Pull(state);
 
         // Existing lever interaction logic
-        int num = (int)(pp.x * 100 + pp.y * 10 + pp.z);
-        int BlockCC = gameManager.lb.interActPairs[num];
+        int num = (int)(playerPosition.x * 100 + playerPosition.y * 10 + playerPosition.z);
+        int BlockCC = _gameManager.levelBuilder.Levels[_gameManager.currentLevelIndex].InterActPairs[num];
         int[] c = new int[4];
+        
         for (int n = 3; n >= 0; n--)
         {
             c[n] = BlockCC % 10;
             BlockCC /= 10;
         }
-        GameObject block = gameManager.current_level[c[0], c[1], c[2]];
+        
+        GameObject block = _gameManager.CurrentLevel[c[0], c[1], c[2]];
         Vector3 blockPos = block.transform.position;
         int i = state ? -1 : 1;
+        
         switch (c[3])
         {
             case 1:
                 i *= -1;
                 blockPos.y += i;
                 block.transform.position = blockPos;
-                gameManager.current_level[c[0], c[1], c[2]] = Instantiate(gameManager.lb.blockTemplates[0]);
-                gameManager.current_level[c[0], c[1] + i, c[2]] = block;
+                _gameManager.CurrentLevel[c[0], c[1], c[2]] = Instantiate(_gameManager.levelBuilder.BlockTemplates[0]);
+                _gameManager.CurrentLevel[c[0], c[1] + i, c[2]] = block;
                 break;
             case 2:
                 blockPos.y += i;
                 block.transform.position = blockPos;
-                gameManager.current_level[c[0], c[1], c[2]] = Instantiate(gameManager.lb.blockTemplates[0]);
-                gameManager.current_level[c[0], c[1] + i, c[2]] = block;
+                _gameManager.CurrentLevel[c[0], c[1], c[2]] = Instantiate(_gameManager.levelBuilder.BlockTemplates[0]);
+                _gameManager.CurrentLevel[c[0], c[1] + i, c[2]] = block;
                 break;
             case 3:
                 i *= -1;
                 blockPos.x += i;
                 block.transform.position = blockPos;
-                gameManager.current_level[c[0], c[1], c[2]] = Instantiate(gameManager.lb.blockTemplates[0]);
-                gameManager.current_level[c[0] + i, c[1], c[2]] = block;
+                _gameManager.CurrentLevel[c[0], c[1], c[2]] = Instantiate(_gameManager.levelBuilder.BlockTemplates[0]);
+                _gameManager.CurrentLevel[c[0] + i, c[1], c[2]] = block;
                 break;
             case 4:
                 blockPos.x += i;
                 block.transform.position = blockPos;
-                gameManager.current_level[c[0], c[1], c[2]] = Instantiate(gameManager.lb.blockTemplates[0]);
-                gameManager.current_level[c[0] + i, c[1], c[2]] = block;
+                _gameManager.CurrentLevel[c[0], c[1], c[2]] = Instantiate(_gameManager.levelBuilder.BlockTemplates[0]);
+                _gameManager.CurrentLevel[c[0] + i, c[1], c[2]] = block;
                 break;
         }
 
         // Refresh the level state
-        gameManager.Flip(pp, false);
-        gameManager.Flip(pp, false);
+        _gameManager.levelFlipper.RefreshLevel();
 
-        gameManager.lb.interActPairs[num] = c[0] * 1000 + (c[1] + i) * 100 + c[2] * 10 + c[3];
+        _gameManager.levelBuilder.Levels[_gameManager.currentLevelIndex].InterActPairs[num] = c[0] * 1000 + (c[1] + i) * 100 + c[2] * 10 + c[3];
 
         // Play lever sound
-        SoundManager.instance.PlaySound(Sound.LEVER);
+        SoundManager.Instance.PlaySound(Sound.Lever);
     }
 }

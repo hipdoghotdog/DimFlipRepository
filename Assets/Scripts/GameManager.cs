@@ -1,30 +1,39 @@
-using System;
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
+using System.Collections;
 
 public class GameManager : MonoBehaviour
 {
-    public int STARTLEVEL = 0;
+    // Singleton Instance
+    public static GameManager Instance;
 
-    public LevelBuilder lb;
-    public LevelFlipper lf;
-    public GameObject player;
-    public GameObject cam;
+    // Level Management
+    public int STARTLEVEL = 7;
+    public GameObject[,,] CurrentLevel;
+
     [HideInInspector]
-    public GameObject[,,] current_level;
-    private bool init = false;
-    public GameObject endScene;
+    public int currentLevelIndex;
 
-    public Animator camAnimator;
-    public Animator playerAnimator; // Assign this in the Inspector
+    [HideInInspector]
+    public LevelBuilder levelBuilder;
 
-    private CameraScript cameraScript;
+    [HideInInspector]
+    public LevelFlipper levelFlipper;
 
-    public ArtifactManager am;
+    // Player and Camera References
+    public GameObject player;
 
-    public PlayerMovement pm;
+    [HideInInspector]
+    public PlayerMovement playerMovement;
+
+    [HideInInspector]
+    public CameraScript cameraScript;
+
+    [HideInInspector]
+    public ArtifactManager artifactManager;
+
+    [HideInInspector]
+    public View currentView;
 
     public enum View
     {
@@ -32,143 +41,165 @@ public class GameManager : MonoBehaviour
         TopdownView
     }
 
-    public View currentView;    
-
-    void Start()
+    private void Awake()
     {
-        am.DisplayText("Hello There!");
+        // Singleton Pattern Implementation
+        if (Instance == null)
+        {
+            Instance = this;
+            DontDestroyOnLoad(gameObject); // Persist between scenes
+        }
+        else
+        {
+            Destroy(gameObject);
+            return; // Exit to prevent further initialization
+        }
 
-        cameraScript = cam.GetComponent<CameraScript>();
+        // Initialize components if necessary
+        InitializeInitialComponents();
+    }
 
-        load_new_level(STARTLEVEL);
+    private void InitializeInitialComponents()
+    {
+        // Display a welcome message or perform initial setup
+        // Assuming 'am' is an ArtifactManager or similar; ensure it's initialized
+        if (artifactManager != null)
+        {
+            artifactManager.DisplayText("Hello There!");
+        }
+        else
+        {
+            Debug.LogWarning("ArtifactManager is not assigned in the GameManager.");
+        }
 
-        pm = player.GetComponent<PlayerMovement>();
-        pm.ResetPlayerPosition();
+        // Initialize CameraScript
+        Camera cam = Camera.main;
+        if (cam != null)
+        {
+            cameraScript = cam.GetComponent<CameraScript>();
+        }
+        else
+        {
+            Debug.LogWarning("Main Camera not found in the scene.");
+        }
+
+        // Load the starting level
+        LoadNewLevel(STARTLEVEL);
+
+        // Initialize PlayerMovement
+        if (player != null)
+        {
+            playerMovement = player.GetComponent<PlayerMovement>();
+            if (playerMovement != null)
+            {
+                playerMovement.ResetPlayerPosition();
+            }
+            else
+            {
+                Debug.LogWarning("PlayerMovement component not found on the player GameObject.");
+            }
+        }
+        else
+        {
+            Debug.LogWarning("Player GameObject is not assigned in the GameManager.");
+        }
     }
 
     public void Flip(Vector3 pp, bool camFlip = true)
     {
-        lf.flipLevel(pp, currentView);
+        if (levelFlipper != null)
+        {
+            levelFlipper.FlipLevel(pp, currentView);
+        }
+        else
+        {
+            Debug.LogWarning("LevelFlipper is not assigned in the GameManager.");
+            return;
+        }
+
+        // Toggle the current view
         currentView = currentView == View.SideView ? View.TopdownView : View.SideView;
 
         if (currentView == View.TopdownView && camFlip)
         {
-            camAnimator.SetTrigger("FlipToTopView");
-        }
-        else if (currentView == View.SideView && camFlip)
-        {
-            camAnimator.SetTrigger("FlipToSideView");
-        }
-
-        // Notify CameraScript to switch view
-        if (camFlip && cameraScript != null)
-        {
-            cameraScript.FlipView(currentView);
+            // Additional camera flip logic can be added here if necessary
+            // For example, adjusting camera angles or positions
         }
     }
 
-    public Block GetBlock(Vector3 p)
+    private void Start()
     {
-        return current_level[(int)p.x, (int)p.y, (int)p.z].GetComponent<Block>();
+        LoadLevel(currentLevelIndex);
     }
 
-
-    // Update is called once per frame
-    void Update()
+    private void LoadLevel(int levelIndex)
     {
-        if (!init)
-        {
-            Flip(player.transform.position, false);
-            Flip(player.transform.position, false);
-            if (currentView == View.TopdownView)
-            {
-                Flip(player.transform.position);
-            }
-            init = true;
-        }
-        if (!pm.isMoving) { 
-            HandleInput();
-        }
+        currentLevelIndex = levelIndex;
+        currentView = View.SideView;
+
+        // Load the scene corresponding to the level
+        SceneManager.LoadScene("Level" + levelIndex);
+
+        // Initialize managers after the scene is loaded
+        SceneManager.sceneLoaded += OnSceneLoaded;
     }
 
-    void HandleInput()
+    private void LoadNewLevel(int levelNumber)
     {
-
-        // Handle reset position
-        if (Input.GetKeyDown(KeyCode.Backspace))
-        {
-            on_next_level(lb.currentLevel - 1); //reload current level
-        }
-
-        // Flip level
-        if (Input.GetKeyDown(KeyCode.Space))
-        {
-            Flip(player.transform.position);
-        }
+        // Implementation for loading a new level
+        // This method can be expanded based on specific requirements
+        LoadLevel(levelNumber);
     }
 
-    public void on_next_level(int level)
+    private void OnSceneLoaded(Scene scene, LoadSceneMode mode)
     {
+        SceneManager.sceneLoaded -= OnSceneLoaded;
 
-        if (level == 5)
+        // Find or initialize managers for the new scene
+        InitializeManagers();
+    }
+
+    private void InitializeManagers()
+    {
+        player = GameObject.FindGameObjectWithTag("Player");
+
+        levelBuilder = FindObjectOfType<LevelBuilder>();
+        levelFlipper = FindObjectOfType<LevelFlipper>();
+        playerMovement = FindObjectOfType<PlayerMovement>();
+        cameraScript = FindObjectOfType<CameraScript>();
+        artifactManager = FindObjectOfType<ArtifactManager>();
+
+        if (levelBuilder != null)
         {
-            endScene.SetActive(true);
+            levelBuilder.Initialize(currentLevelIndex);
         }
         else
         {
-            init = false;
+            Debug.LogWarning("LevelBuilder not found in the scene.");
         }
 
-        destroy_current_level();
-
-        load_new_level(level + 1);
-
-        pm.ResetPlayerPosition();
-
-        switch (level)
+        if (levelFlipper != null)
         {
-            case 1:
-                am.DisplayText("Great! Try finding somewhere to climb up.");
-                break;
-            case 2:
-                am.DisplayText("What a confusing mess of blocks! I can reset you back to the start if you get lost.");
-                break;
-            case 3:
-                am.DisplayText("Well done! Look at that lever there.");
-                break;
-            case 4:
-                am.DisplayText("Hmm, this looks challenging. There must be a catch to get through this.");
-                break;
-            case 5:
-                am.DisplayText("Try to push the wooden crate. Remember you can reset with 'Backspace'");
-                break;
+            levelFlipper.Initialize();
+        }
+        else
+        {
+            Debug.LogWarning("LevelFlipper not found in the scene.");
+        }
+
+        if (artifactManager != null)
+        {
+            artifactManager.Initialize();
+        }
+        else
+        {
+            Debug.LogWarning("ArtifactManager not found in the scene.");
         }
     }
 
-    public void destroy_current_level()
+    public void NextLevel()
     {
-        for (int i = 0; i < current_level.GetLength(0); i++)
-        {
-            for (int k = 0; k < current_level.GetLength(1); k++)
-            {
-                for (int j = 0; j < current_level.GetLength(2); j++)
-                {
-                    if (current_level[i, k, j] == null) { continue; }
-
-                    Destroy(current_level[i, k, j]);
-                }
-            }
-        }
-        current_level = null;
-    }
-
-    public void load_new_level(int new_level)
-    {
-        lb.currentLevel = new_level;
-
-        lf.SetLevel(lb.RemoteBuild());
-
-        current_level = lf.level;
+        LoadLevel(currentLevelIndex + 1);
     }
 
     public void CheckGravity()
@@ -178,13 +209,13 @@ public class GameManager : MonoBehaviour
         {
             blocksFell = false;
 
-            for (int x = 0; x < current_level.GetLength(0); x++)
+            for (int x = 0; x < CurrentLevel.GetLength(0); x++)
             {
-                for (int y = 0; y < current_level.GetLength(1); y++)
+                for (int y = 0; y < CurrentLevel.GetLength(1); y++)
                 {
-                    for (int z = 0; z < current_level.GetLength(2); z++)
+                    for (int z = 0; z < CurrentLevel.GetLength(2); z++)
                     {
-                        GameObject go = current_level[x, y, z];
+                        GameObject go = CurrentLevel[x, y, z];
                         if (go == null) continue;
 
                         Block block = go.GetComponent<Block>();
@@ -194,24 +225,22 @@ public class GameManager : MonoBehaviour
                             if (belowY < 0)
                             {
                                 // Block falls out of the level
-                                // Instead of destroying immediately, animate it falling out.
-                                // Let's say we drop it one extra unit below:
                                 Vector3 fallOutPos = new Vector3(x, -1, z);
                                 StartCoroutine(FallOutOfLevelCoroutine(go, fallOutPos));
 
-                                current_level[x, y, z] = null;
+                                CurrentLevel[x, y, z] = null;
                                 blocksFell = true;
                             }
                             else
                             {
                                 // Check if below is empty
-                                GameObject belowBlockGO = current_level[x, belowY, z];
+                                GameObject belowBlockGO = CurrentLevel[x, belowY, z];
                                 if (belowBlockGO == null)
                                 {
                                     // Just fall down
                                     StartCoroutine(MoveBlockCoroutine(block, new Vector3(x, belowY, z)));
-                                    current_level[x, belowY, z] = go;
-                                    current_level[x, y, z] = null;
+                                    CurrentLevel[x, belowY, z] = go;
+                                    CurrentLevel[x, y, z] = null;
                                     blocksFell = true;
                                 }
                                 else
@@ -221,8 +250,8 @@ public class GameManager : MonoBehaviour
                                     {
                                         // Swap with empty block
                                         StartCoroutine(MoveBlockCoroutine(block, new Vector3(x, belowY, z)));
-                                        current_level[x, belowY, z] = go;
-                                        current_level[x, y, z] = belowBlockGO;
+                                        CurrentLevel[x, belowY, z] = go;
+                                        CurrentLevel[x, y, z] = belowBlockGO;
                                         blocksFell = true;
                                     }
                                 }
@@ -259,7 +288,7 @@ public class GameManager : MonoBehaviour
         }
     }
 
-    // New coroutine for falling out of the level
+    // Coroutine for falling out of the level
     public IEnumerator FallOutOfLevelCoroutine(GameObject blockGO, Vector3 targetPosition)
     {
         Block block = blockGO.GetComponent<Block>();
@@ -268,13 +297,10 @@ public class GameManager : MonoBehaviour
         // Animate the block falling out of the level
         yield return MoveBlockCoroutine(block, targetPosition);
 
-        // After finishing the animation, we can now safely destroy the block
+        // After finishing the animation, safely destroy the block
         if (blockGO != null)
         {
             Destroy(blockGO);
         }
     }
-
-
-
 }

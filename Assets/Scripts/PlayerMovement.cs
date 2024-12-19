@@ -1,36 +1,35 @@
 using System.Collections;
 using System.Collections.Generic;
+using DefaultNamespace;
 using UnityEngine;
 using static GameManager;
 
 public class PlayerMovement : MonoBehaviour
 {
-    private GameManager gameManager;
+    private static readonly int IsWalking = Animator.StringToHash("isWalking");
+    private GameManager _gameManager;
 
     public float moveSpeed = 5f;
     public float rotationSpeed = 720f;
     public Animator playerAnimator;
-    private Quaternion targetRotation;
-    private Vector3 targetPosition;
+    private Quaternion _targetRotation;
+    private Vector3 _targetPosition;
     public bool isMoving = false;
 
     // Movement queue for handling step-by-step movement
-    private Queue<Vector3> movementQueue = new Queue<Vector3>();
+    private readonly Queue<Vector3> _movementQueue = new();
 
-    void Awake()
+    private void Awake()
     {
-        gameManager = FindObjectOfType<GameManager>();
-        if (gameManager == null)
-        {
-            Debug.LogError("GameManager not found in the scene.");
-        }
+        _gameManager = Instance;
     }
 
-    void Update()
+    private void Update()
     {
+        // Handle rotation towards the target rotation
         transform.rotation = Quaternion.RotateTowards(
             transform.rotation,
-            targetRotation,
+            _targetRotation,
             rotationSpeed * Time.deltaTime
         );
 
@@ -42,74 +41,91 @@ public class PlayerMovement : MonoBehaviour
         {
             MovePlayer();
         }
-
-
-        //Debug.LogWarning($"");
     }
 
-    public bool CanIStepOnBlock(Vector3 position)
+    private Block GetBlock(Vector3 position)
     {
-        string blockType = gameManager.GetBlock(position).GetBlockType();
-        return !gameManager.lb.GetUnsteppableBlocks().Contains(blockType);
+        if (_gameManager.CurrentLevel == null)
+        {
+            Debug.LogError("PlayerMovement: CurrentLevel is null in GameManager.");
+            return null;
+        }
+
+        if (position.x < 0 || position.x >= _gameManager.CurrentLevel.GetLength(0) ||
+            position.y < 0 || position.y >= _gameManager.CurrentLevel.GetLength(1) ||
+            position.z < 0 || position.z >= _gameManager.CurrentLevel.GetLength(2))
+        {
+            Debug.LogWarning($"PlayerMovement: Position {position} is out of bounds.");
+            return null;
+        }
+
+        GameObject blockGO = _gameManager.CurrentLevel[(int)position.x, (int)position.y, (int)position.z];
+        if (blockGO == null)
+            return null;
+
+        return blockGO.GetComponent<Block>();
     }
 
-    void HandleInput()
+    private bool CanIStepOnBlock(Vector3 position)
+    {
+        Block block = GetBlock(position);
+        if (block == null)
+        {
+            Debug.LogWarning($"PlayerMovement: No block found at position {position}.");
+            return false;
+        }
+
+        string blockType = block.GetBlockType();
+        return !_gameManager.levelBuilder.GetUnsteppableBlocks().Contains(blockType);
+    }
+
+    private void HandleInput()
     {
         // Check horizontal movement
         if (Input.GetKey(KeyCode.RightArrow))
         {
-            if (TryMoveHorizontal(1, Quaternion.Euler(0, 0, 0)))
-                return;
+            TryMoveHorizontal(1, Quaternion.Euler(0, 0, 0));
         }
         else if (Input.GetKey(KeyCode.LeftArrow))
         {
-            if (TryMoveHorizontal(-1, Quaternion.Euler(0, 180, 0)))
-                return;
+            TryMoveHorizontal(-1, Quaternion.Euler(0, 180, 0));
         }
-
-        // Check vertical movement only in top-down view
-        if (gameManager.currentView == View.TopdownView)
+        else if (_gameManager.currentView == View.TopdownView)
         {
             if (Input.GetKey(KeyCode.UpArrow))
             {
-                if (TryMoveVertical(1, Quaternion.Euler(0, -90, 0)))
-                    return;
+                TryMoveVertical(1, Quaternion.Euler(0, -90, 0));
             }
             else if (Input.GetKey(KeyCode.DownArrow))
             {
-                if (TryMoveVertical(-1, Quaternion.Euler(0, 90, 0)))
-                    return;
+                TryMoveVertical(-1, Quaternion.Euler(0, 90, 0));
             }
         }
     }
 
-    bool TryMoveHorizontal(int xIncrement, Quaternion desiredRotation)
+    private void TryMoveHorizontal(int xIncrement, Quaternion desiredRotation)
     {
         Vector3 currentPosition = transform.position;
-        Vector3 newPosition = currentPosition;
 
-        int maxX = gameManager.current_level.GetLength(0) - 1;
+        int maxX = _gameManager.CurrentLevel.GetLength(0) - 1;
         if ((xIncrement > 0 && currentPosition.x >= maxX) || (xIncrement < 0 && currentPosition.x <= 0))
-            return false;
+            return;
 
-        if (gameManager.currentView == View.TopdownView)
+        if (_gameManager.currentView == View.TopdownView)
         {
             Vector3 targetPos = currentPosition + new Vector3(xIncrement, 0, 0);
             if (CanIStepOnBlock(targetPos))
             {
                 StartMovement(targetPos, desiredRotation);
-                return true;
             }
         }
         else
         {
-            if (TrySideViewMovement(xIncrement, desiredRotation))
-                return true;
+            TrySideViewMovement(xIncrement, desiredRotation);
         }
-        return false;
     }
 
-    bool TrySideViewMovement(int xIncrement, Quaternion desiredRotation)
+    private void TrySideViewMovement(int xIncrement, Quaternion desiredRotation)
     {
         Vector3 currentPosition = transform.position;
         Vector3 newPosition = currentPosition;
@@ -118,21 +134,19 @@ public class PlayerMovement : MonoBehaviour
         Vector3 toPosDown = currentPosition + new Vector3(xIncrement, -1, 0);
         Vector3 toPosSame = currentPosition + new Vector3(xIncrement, 0, 0);
 
-        int maxY = gameManager.current_level.GetLength(1) - 1;
+        int maxY = _gameManager.CurrentLevel.GetLength(1) - 1;
 
         // Check for climbing up
         if (currentPosition.y < maxY && CanIStepOnBlock(toPosUp) && CanIUseLadder(currentPosition, toPosUp))
         {
             newPosition += new Vector3(xIncrement, 1, 0);
             StartMovement(newPosition, desiredRotation, isDownwardLadderMovement: false); // Moving up
-            return true;
         }
         // Check for climbing down
         else if (currentPosition.y > 0 && CanIStepOnBlock(toPosDown) && CanIUseLadder(currentPosition, toPosDown))
         {
             newPosition += new Vector3(xIncrement, -1, 0);
             StartMovement(newPosition, desiredRotation, isDownwardLadderMovement: true); // Moving down
-            return true;
         }
         // Regular horizontal movement or pushing a block
         else
@@ -171,222 +185,206 @@ public class PlayerMovement : MonoBehaviour
 
                 newPosition += new Vector3(xIncrement, 0, 0);
                 StartMovement(newPosition, desiredRotation);
-                return true;
             }
             else
             {
                 // Retrieve the block at the same horizontal position but one layer up
                 Vector3 blockPosition = toPosSame + Vector3.up;
-                Block blockAtToPosSame = gameManager.GetBlock(blockPosition);
+                Block blockAtToPosSame = GetBlock(blockPosition);
 
                 Debug.LogWarning(blockAtToPosSame.GetBlockType());
 
                 // Check if the block is pushable and on the correct level
                 if (blockAtToPosSame != null  && Mathf.Approximately(blockAtToPosSame.transform.position.y, currentPosition.y + 1))
                 {
-                    if (blockAtToPosSame.isPushable) { 
-                        // Calculate the position ahead of the pushable block
-                        Vector3 pushBlockTargetPos = blockPosition + new Vector3(xIncrement, 0, 0); // Maintain the y-offset
+                    // Calculate the position ahead of the pushable block
+                    Vector3 pushBlockTargetPos = blockPosition + new Vector3(xIncrement, 0, 0); // Maintain the y-offset
 
-                        // Check if the position ahead is within bounds
-                        int maxX = gameManager.current_level.GetLength(0) - 1;
-                        int maxZ = gameManager.current_level.GetLength(2) - 1;
-                        maxY = gameManager.current_level.GetLength(1) - 1;
+                    // Check if the position ahead is within bounds
+                    int maxX = _gameManager.CurrentLevel.GetLength(0) - 1;
+                    int maxZ = _gameManager.CurrentLevel.GetLength(2) - 1;
+                    maxY = _gameManager.CurrentLevel.GetLength(1) - 1;
 
-                        if (pushBlockTargetPos.x >= 0 && pushBlockTargetPos.x <= maxX &&
-                            pushBlockTargetPos.z >= 0 && pushBlockTargetPos.z <= maxZ &&
-                            pushBlockTargetPos.y >= 0 && pushBlockTargetPos.y <= maxY)
+                    if (pushBlockTargetPos.x >= 0 && pushBlockTargetPos.x <= maxX &&
+                        pushBlockTargetPos.z >= 0 && pushBlockTargetPos.z <= maxZ &&
+                        pushBlockTargetPos.y >= 0 && pushBlockTargetPos.y <= maxY)
+                    {
+                        // Check if the block at the target position is null or empty
+                        Block targetBlock = GetBlock(pushBlockTargetPos);
+
+                        if (targetBlock == null || targetBlock.blockType.ToLower() == "empty")
                         {
-                            // Check if the block at the target position is null or empty
-                            Block targetBlock = gameManager.GetBlock(pushBlockTargetPos);
-
-                            if (targetBlock == null || targetBlock.blockType.ToLower() == "empty")
-                            {
-                                //
-                                playerAnimator.SetTrigger("Push");
-                                SoundManager.instance.PlaySound(Sound.PUSH);
+                            // Play push animation and sound
+                            playerAnimator.SetTrigger("Push");
+                            SoundManager.Instance.PlaySound(Sound.Push);
 
                                 // Move the blocks
                                 MoveBlock(blockAtToPosSame, pushBlockTargetPos);
                                 MoveBlock(targetBlock, blockPosition);
 
-
                                 // Update the level array
-                                GameObject temp = gameManager.current_level[(int)pushBlockTargetPos.x, (int)pushBlockTargetPos.y, (int)pushBlockTargetPos.z];
-                            
-                                gameManager.current_level[(int)pushBlockTargetPos.x, (int)pushBlockTargetPos.y, (int)pushBlockTargetPos.z] =
-                                    gameManager.current_level[(int)blockPosition.x, (int)blockPosition.y, (int)blockPosition.z];
+                                Vector3Int targetPos = Vector3Int.RoundToInt(pushBlockTargetPos);
+                                Vector3Int currentPos = Vector3Int.RoundToInt(blockPosition);
 
-                                gameManager.current_level[(int)blockPosition.x, (int)blockPosition.y, (int)blockPosition.z] = temp;
+                                // Swap the blocks in the level array
+                                (_gameManager.CurrentLevel[targetPos.x, targetPos.y, targetPos.z],
+                                _gameManager.CurrentLevel[currentPos.x, currentPos.y, currentPos.z]) =
+                                    (_gameManager.CurrentLevel[currentPos.x, currentPos.y, currentPos.z],
+                                    _gameManager.CurrentLevel[targetPos.x, targetPos.y, targetPos.z]);
 
-
-                                // Move the player to the position of the block
-                                newPosition += new Vector3(xIncrement, 0, 0);
-                                StartMovement(newPosition, desiredRotation, false, false);
-                                return true;
-                            }
+                            // Move the player to the position of the block
+                            newPosition += new Vector3(xIncrement, 0, 0);
+                            StartMovement(newPosition, desiredRotation, activateWalkingAni: false);
                         }
                     }
                 }
             }
         }
-        return false;
-    }
 
-    public void MoveBlock(Block block, Vector3 newPosition)
-    {
-        StartCoroutine(gameManager.MoveBlockCoroutine(block, newPosition));
-    }
+    #region MoveBlock Method
+        /// <summary>
+        /// Initiates the movement of a block to a new position using GameManager's coroutine.
+        /// </summary>
+        /// <param name="block">The block to move.</param>
+        /// <param name="newPosition">The target position.</param>
+        public void MoveBlock(Block block, Vector3 newPosition)
+        {
+            if (_gameManager == null)
+            {
+                Debug.LogError("PlayerMovement: GameManager instance is null.");
+                return;
+            }
 
-    bool TryMoveVertical(int zIncrement, Quaternion desiredRotation)
+            if (block == null)
+            {
+                Debug.LogWarning("PlayerMovement: Attempted to move a null block.");
+                return;
+            }
+
+            _gameManager.StartCoroutine(_gameManager.MoveBlockCoroutine(block, newPosition));
+        }
+    #endregion
+
+    private void TryMoveVertical(int zIncrement, Quaternion desiredRotation)
     {
         Vector3 currentPosition = transform.position;
-        Vector3 newPosition = currentPosition;
 
-        int maxZ = gameManager.current_level.GetLength(2) - 1;
-        if ((zIncrement > 0 && currentPosition.z >= maxZ) || (zIncrement < 0 && currentPosition.z <= 0))
-            return false;
+        int maxZ = _gameManager.CurrentLevel.GetLength(2) - 1;
+        if ((zIncrement > 0 && currentPosition.z >= maxZ) || (zIncrement < 0 && currentPosition.z <= 0)) return;
 
         Vector3 targetPos = currentPosition + new Vector3(0, 0, zIncrement);
         if (CanIStepOnBlock(targetPos))
         {
             StartMovement(targetPos, desiredRotation);
-            return true;
         }
-        return false;
     }
-    void StartMovement(Vector3 newPosition, Quaternion desiredRotation, bool isDownwardLadderMovement = false, bool activateWalkingAni = true)
+
+    private void StartMovement(Vector3 newPosition, Quaternion desiredRotation, bool isDownwardLadderMovement = false, bool activateWalkingAni = true)
     {
+        _movementQueue.Clear();
         if (isDownwardLadderMovement)
         {
-            movementQueue.Clear();
-
             Vector3 currentPosition = transform.position;
             Vector3 delta = newPosition - currentPosition;
 
             if (delta.x != 0 && delta.y != 0)
             {
-                Vector3 intermediatePos = new Vector3(currentPosition.x + delta.x, currentPosition.y, currentPosition.z); 
-                movementQueue.Enqueue(intermediatePos);
-                movementQueue.Enqueue(newPosition); 
+                Vector3 intermediatePos = new Vector3(currentPosition.x + delta.x, currentPosition.y, currentPosition.z);
+                _movementQueue.Enqueue(intermediatePos);
             }
-            else
-            {
-                movementQueue.Enqueue(newPosition);
-            }
-
-            targetPosition = movementQueue.Dequeue();
-            isMoving = true;
-            playerAnimator.SetBool("isWalking", activateWalkingAni);
-
         }
-        else
-        {
-            movementQueue.Clear();
-            movementQueue.Enqueue(newPosition);
 
-            targetPosition = movementQueue.Dequeue();
-            isMoving = true;
-            playerAnimator.SetBool("isWalking", activateWalkingAni);
-        }
+        _movementQueue.Enqueue(newPosition);
+
+        _targetPosition = _movementQueue.Dequeue();
+        isMoving = true;
+        playerAnimator.SetBool(IsWalking, activateWalkingAni);
 
         // Handle rotation
         float angleDifference = Quaternion.Angle(transform.rotation, desiredRotation);
         if (angleDifference > 1f)
         {
-            targetRotation = desiredRotation;
+            _targetRotation = desiredRotation;
         }
 
         // Play step sound
-        SoundManager.instance.PlaySound(Sound.STEP);
+        SoundManager.Instance.PlaySound(Sound.Step);
     }
 
-    public void MovePlayer()
+    private void MovePlayer()
     {
-        if (gameManager == null)
+        if (_gameManager == null)
         {
-            Debug.LogError("GameManager reference is missing.");
+            Debug.LogError("PlayerMovement: GameManager reference is missing.");
             return;
         }
 
-        transform.position = Vector3.MoveTowards(transform.position, targetPosition, moveSpeed * Time.deltaTime);
+        transform.position = Vector3.MoveTowards(transform.position, _targetPosition, moveSpeed * Time.deltaTime);
 
-        if (Vector3.Distance(transform.position, targetPosition) < 0.01f)
+        if (Vector3.Distance(transform.position, _targetPosition) < 0.01f)
         {
-            transform.position = targetPosition;
+            transform.position = _targetPosition;
 
-            if (movementQueue.Count > 0)
+            if (_movementQueue.Count > 0)
             {
                 // Continue to the next position in the queue
-                targetPosition = movementQueue.Dequeue();
+                _targetPosition = _movementQueue.Dequeue();
             }
             else
             {
                 // Movement complete
                 isMoving = false;
-                playerAnimator.SetBool("isWalking", false);
+                playerAnimator.SetBool(IsWalking, false);
 
                 // Check for level completion
-                if (gameManager.GetBlock(transform.position).GetBlockType() == "end")
+                Block currentBlock = GetBlock(transform.position);
+                if (currentBlock != null && currentBlock.GetBlockType() == "end")
                 {
-                    gameManager.on_next_level(gameManager.lb.currentLevel);
+                    _gameManager.NextLevel();
                 }
 
                 // After the player stops moving, apply gravity to blocks
-                gameManager.CheckGravity();
+                _gameManager.CheckGravity();
             }
-
         }
     }
 
+    /// <summary>
+    /// Resets the player's position to the start position defined in LevelBuilder.
+    /// </summary>
     public void ResetPlayerPosition()
     {
-        Vector3 startPosition = gameManager.lb.startBlockPosition;
+        if (_gameManager == null || _gameManager.levelBuilder == null)
+        {
+            Debug.LogError("PlayerMovement: GameManager or LevelBuilder reference is missing.");
+            return;
+        }
+
+        Vector3 startPosition = _gameManager.levelBuilder.GetStartBlockPosition();
         transform.position = startPosition;
-        targetPosition = startPosition;
+        _targetPosition = startPosition;
         isMoving = true;
-        playerAnimator.SetBool("isWalking", true);
-        targetRotation = Quaternion.identity;
-
-        gameManager.cam.transform.position = new Vector3(
-            gameManager.current_level.GetLength(0) / 2,
-            startPosition.y + 5,
-            startPosition.z - 10
-        );
-        gameManager.cam.transform.LookAt(new Vector3(
-            gameManager.current_level.GetLength(0) / 2,
-            startPosition.y,
-            startPosition.z
-        ));
-
-        if (gameManager.currentView == View.TopdownView)
-        {
-            gameManager.Flip(startPosition);
-        }
-        else
-        {
-            gameManager.Flip(startPosition, false);
-            gameManager.Flip(startPosition, false);
-        }
+        playerAnimator.SetBool(IsWalking, true);
+        _targetRotation = Quaternion.identity;
     }
 
-    public bool CanIUseLadder(Vector3 playerPos, Vector3 targetPos)
+    private bool CanIUseLadder(Vector3 playerPos, Vector3 targetPos)
     {
         Vector3 delta = targetPos - playerPos;
 
-        if (delta.x == 1) // Moving right
+        if (Mathf.Approximately(delta.x, 1)) // Moving right
         {
-            if (delta.y == 1) // Climbing up
-                return gameManager.GetBlock(playerPos + Vector3.up).GetBlockType() == "right ladder";
-            else if (delta.y == -1) // Climbing down
-                return gameManager.GetBlock(playerPos + Vector3.right).GetBlockType() == "left ladder";
+            if (Mathf.Approximately(delta.y, 1)) // Climbing up
+                return GetBlock(playerPos + Vector3.up).GetBlockType() == "right ladder";
+            if (Mathf.Approximately(delta.y, -1)) // Climbing down
+                return GetBlock(playerPos + Vector3.right).GetBlockType() == "left ladder";
         }
-        else if (delta.x == -1) // Moving left
+        else if (Mathf.Approximately(delta.x, -1)) // Moving left
         {
-            if (delta.y == 1) // Climbing up
-                return gameManager.GetBlock(playerPos + Vector3.up).GetBlockType() == "left ladder";
-            else if (delta.y == -1) // Climbing down
-                return gameManager.GetBlock(playerPos + Vector3.left).GetBlockType() == "right ladder";
+            if (Mathf.Approximately(delta.y, 1)) // Climbing up
+                return GetBlock(playerPos + Vector3.up).GetBlockType() == "left ladder";
+            if (Mathf.Approximately(delta.y, -1)) // Climbing down
+                return GetBlock(playerPos + Vector3.left).GetBlockType() == "right ladder";
         }
         return false;
     }

@@ -1,51 +1,88 @@
-using System.Collections;
-using System.Collections.Generic;
+using System;
 using UnityEngine;
+using Random = UnityEngine.Random;
 
-public enum Sound {
-    STEP,
-    LEVER,
-    PUSH,
-    ARTIFACT_TALK,
+public enum Sound
+{
+    Step,
+    Lever,
+    Push,
+    ArtifactTalk,
 }
 
 public class SoundManager : MonoBehaviour
 {
+    public AudioClip[] audioClips; // Array for sound effects
+    public AudioClip backgroundMusic; // The background music clip
 
-    public AudioClip[] audioClips;
+    public static SoundManager Instance;
 
-    public static SoundManager instance;
-    private AudioSource au;
+    private AudioSource _soundEffectsSource; // For sound effects
+    private AudioSource _musicSource; // For background music
 
-    // Start is called before the first frame update
-    void Awake()
+    private void Awake()
     {
-        instance = this;
-    }
+        if (Instance == null)
+        {
+            Instance = this;
+            DontDestroyOnLoad(gameObject);
 
-    void Start() {
-        au = GetComponent<AudioSource>();
-    }
+            // Add two AudioSources dynamically
+            _soundEffectsSource = gameObject.AddComponent<AudioSource>();
+            _musicSource = gameObject.AddComponent<AudioSource>();
 
-    // Add volume scaling later
-    public void PlaySound(Sound sound, float volume = 1f) {
-        switch (sound){
-            case Sound.STEP:
-                int randSoundNumber = Random.Range(0, 3);
-                au.PlayOneShot(audioClips[randSoundNumber], volume);
-                break;
-            case Sound.LEVER:
-                au.PlayOneShot(audioClips[3], volume);
-                break;
-            case Sound.PUSH:
-                au.PlayOneShot(audioClips[4], volume);
-                break;
-            case Sound.ARTIFACT_TALK:
-                int randSoundNumber2 = Random.Range(5, 9);
-                au.PlayOneShot(audioClips[randSoundNumber2], volume);
-                break;
+            // Configure musicSource for looping background music
+            _musicSource.loop = true;
+        }
+        else
+        {
+            Destroy(gameObject);
         }
     }
 
+    private void Start()
+    {
+        PlayBackgroundMusic();
+    }
 
+    public void PlaySound(Sound sound, float volume = 1f)
+    {
+        switch (sound)
+        {
+            case Sound.Step:
+                int randSoundNumber = Random.Range(0, 3);
+                _soundEffectsSource.PlayOneShot(audioClips[randSoundNumber], volume);
+                break;
+            case Sound.Lever:
+                _soundEffectsSource.PlayOneShot(audioClips[3], volume);
+                break;
+            case Sound.Push:
+                _soundEffectsSource.PlayOneShot(audioClips[4], volume);
+                break;
+            case Sound.ArtifactTalk:
+                int randSoundNumber2 = Random.Range(5, 9);
+                _soundEffectsSource.PlayOneShot(audioClips[randSoundNumber2], volume);
+                break;
+            default:
+                throw new ArgumentOutOfRangeException(nameof(sound), sound, null);
+        }
+    }
+
+    private void PlayBackgroundMusic(float volume = 0.5f)
+    {
+        if (backgroundMusic == null)
+        {
+            Debug.LogWarning("SoundManager: Background music clip is not assigned.");
+            return;
+        }
+
+        _musicSource.clip = backgroundMusic;
+        _musicSource.volume = volume;
+        _musicSource.Play();
+    }
+
+    public void StopBackgroundMusic()
+    {
+        _musicSource.Stop();
+    }
 }
