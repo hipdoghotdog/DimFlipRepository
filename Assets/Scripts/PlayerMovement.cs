@@ -132,6 +132,31 @@ public class PlayerMovement : MonoBehaviour
             // Check if the target position is steppable
             if (CanIStepOnBlock(toPosSame) && (currentPosition.y == maxY || !CanIStepOnBlock(toPosSame + Vector3.up)))
             {
+                Vector3 blockPosition = toPosSame + Vector3.up;
+                Block blockAtToPosSame = GetBlock(blockPosition);
+                if (blockAtToPosSame != null && blockAtToPosSame.GetBlockType() == "story")
+                {
+                    const float yThreshold = 0.2f;
+
+                    // Calculate the expected Y-position
+                    float expectedY = currentPosition.y + 1f;
+                    float actualY = blockAtToPosSame.transform.position.y;
+
+                    // Check if the actual Y-position is within the acceptable range
+                    if (Mathf.Abs(actualY - expectedY) < yThreshold)
+                    {
+                        _gameManager.artifactManager.DisplayText(blockAtToPosSame.storyText);
+
+                        blockAtToPosSame.blockType = "empty";
+                        blockAtToPosSame.ApplyTheme();
+
+                        int x = Mathf.RoundToInt(blockPosition.x);
+                        int y = Mathf.RoundToInt(blockPosition.y);
+                        int z = Mathf.RoundToInt(blockPosition.z);
+                        _gameManager.CurrentLevel[x, y, z] = _gameManager.levelBuilder.blockTemplates[0];
+                    }
+                }
+
                 newPosition += new Vector3(xIncrement, 0, 0);
                 StartMovement(newPosition, desiredRotation);
             }
