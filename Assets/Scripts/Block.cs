@@ -2,12 +2,10 @@ using UnityEngine;
 
 public class Block : MonoBehaviour
 {
-    private static readonly int IsActive = Animator.StringToHash("isActive");
-    private static readonly int SwitchOn = Animator.StringToHash("switchOn");
     public bool switchOn = false;
     public bool isActive = true;
-    private Animator _blockAnim;
-    private MeshRenderer _meshRenderer;
+    private Animator blockAnim;
+    private MeshRenderer meshRenderer;
     public string blockType;
 
     // New properties
@@ -27,8 +25,8 @@ public class Block : MonoBehaviour
 
     void Start()
     {
-        _blockAnim = GetComponent<Animator>();
-        _meshRenderer = GetComponent<MeshRenderer>();
+        blockAnim = GetComponent<Animator>();
+        meshRenderer = GetComponent<MeshRenderer>();
         ApplyTheme();
 
         // Initialize pushable and pullable based on blockType
@@ -78,10 +76,7 @@ public class Block : MonoBehaviour
     public void ApplyTheme()
     {
         ThemeData theme = ThemeManager.Instance.currentTheme;
-        
-        if (theme == null || _meshRenderer == null) return;
-        
-        switch (blockType.ToLower())
+        if (theme != null && meshRenderer != null)
         {
             switch (blockType.ToLower())
             {
@@ -119,9 +114,10 @@ public class Block : MonoBehaviour
 
     public virtual void Activate(bool state)
     {
-        if (_blockAnim != null)
+        if (blockAnim != null)
         {
-            _blockAnim.SetBool(IsActive, state);
+            // For ALL blocks, including levers, set isActive so they appear/disappear properly
+            blockAnim.SetBool("isActive", state);
         }
         isActive = state;
 
@@ -134,9 +130,9 @@ public class Block : MonoBehaviour
 
     public virtual void Pull(bool state)
     {
-        if (_blockAnim != null)
+        if (blockAnim != null)
         {
-            _blockAnim.SetBool(SwitchOn, state);
+            blockAnim.SetBool("switchOn", state);
         }
         switchOn = state;
 

@@ -12,7 +12,7 @@ public class ThemeManager : MonoBehaviour
         if (Instance == null)
         {
             Instance = this;
-            DontDestroyOnLoad(this.gameObject);
+            // Optional: DontDestroyOnLoad(this.gameObject);
         }
         else
         {
