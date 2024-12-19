@@ -55,24 +55,27 @@ public class PlayerMovement : MonoBehaviour
 
     void HandleInput()
     {
-        if (Input.GetKeyDown(KeyCode.RightArrow))
+        // Check horizontal movement
+        if (Input.GetKey(KeyCode.RightArrow))
         {
             if (TryMoveHorizontal(1, Quaternion.Euler(0, 0, 0)))
                 return;
         }
-        else if (Input.GetKeyDown(KeyCode.LeftArrow))
+        else if (Input.GetKey(KeyCode.LeftArrow))
         {
             if (TryMoveHorizontal(-1, Quaternion.Euler(0, 180, 0)))
                 return;
         }
-        else if (gameManager.currentView == View.TopdownView)
+
+        // Check vertical movement only in top-down view
+        if (gameManager.currentView == View.TopdownView)
         {
-            if (Input.GetKeyDown(KeyCode.UpArrow))
+            if (Input.GetKey(KeyCode.UpArrow))
             {
                 if (TryMoveVertical(1, Quaternion.Euler(0, -90, 0)))
                     return;
             }
-            else if (Input.GetKeyDown(KeyCode.DownArrow))
+            else if (Input.GetKey(KeyCode.DownArrow))
             {
                 if (TryMoveVertical(-1, Quaternion.Euler(0, 90, 0)))
                     return;
@@ -158,7 +161,11 @@ public class PlayerMovement : MonoBehaviour
                         int x = Mathf.RoundToInt(blockPosition.x);
                         int y = Mathf.RoundToInt(blockPosition.y);
                         int z = Mathf.RoundToInt(blockPosition.z);
-                        gameManager.current_level[x, y, z] = gameManager.lb.blockTemplates[0];
+                        GameObject oldBlock = gameManager.current_level[x, y, z];
+                        Destroy(oldBlock);
+
+                        GameObject newBlock = Instantiate(gameManager.lb.blockTemplates[0], new Vector3(x, y, z), Quaternion.identity);
+                        gameManager.current_level[x, y, z] = newBlock;
                     }
                 }
 
