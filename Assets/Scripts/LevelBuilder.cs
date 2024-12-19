@@ -181,8 +181,8 @@ public class LevelBuilder : MonoBehaviour
             }
         ));
     }
-    
-    private void BuildDictionary()
+
+    public void BuildDictionary()
     {
         ThemeData theme = ThemeManager.Instance.currentTheme;
 
@@ -197,6 +197,7 @@ public class LevelBuilder : MonoBehaviour
             {6, theme.leverModel},
             {7, theme.blockwlightModel},
             {8, theme.pushableModel},
+            {9, theme.storyModel},
         };
     }
 
@@ -292,7 +293,7 @@ public class LevelBuilder : MonoBehaviour
         switch (currentLevel)
         {
             case 0:
-                basic1();
+                testlevel();
                 break;
             case 1:
                 basic2();
@@ -328,18 +329,44 @@ public class LevelBuilder : MonoBehaviour
     }
 
 
+    void testlevel()
+    {
+        levelTemplate = new int[,,] {
+            { {2}, {0} },
+            { {1}, {0} },
+            { {1}, {9} },
+            { {1}, {0} },
+            { {1}, {9} },
+            { {1}, {0} },
+            { {1}, {9} },
+            { {1}, {0} },
+            { {1}, {9} },
+            { {3}, {0} },
+        };
+
+        storyBlockTexts.Clear();
+        storyBlockTexts.Add(new Vector3Int(2, 1, 0), "HELLO"); //(SIDEVIEW DIRECTION, HEIGHT, TOPVIEW DIRECTION)
+        storyBlockTexts.Add(new Vector3Int(4, 1, 0), "HELLO THERE");
+        storyBlockTexts.Add(new Vector3Int(6, 1, 0), "HELLO AGAIN");
+        storyBlockTexts.Add(new Vector3Int(8, 1, 0), "123");
+    }
+
+
     /*  ---------------- BASIC ---------------- */
 
     void basic1()
     {
         levelTemplate = new int[,,] {
             { {2}, {0} },
-            { {1}, {0} },
+            { {1}, {9} },
             { {7}, {0} },
             { {1}, {1} },
             { {1}, {0} },
             { {3}, {0} },
         };
+
+        storyBlockTexts.Clear();
+        storyBlockTexts.Add(new Vector3Int(1, 1, 0), "HELLO"); //(SIDEVIEW DIRECTION, HEIGHT, TOPVIEW DIRECTION)
     }
 
     void basic2()
@@ -518,6 +545,23 @@ public class LevelBuilder : MonoBehaviour
                     {
                         blockComponent.blockType = GetBlockTypeFromID(blockID);
                         blockComponent.ApplyTheme(); // Apply the theme after setting blockType
+
+                        if (blockID == 9)
+                        {
+                            
+                            Vector3Int coord = new Vector3Int(i, k, j);
+                            if (storyBlockTexts.ContainsKey(coord))
+                            {
+                                blockComponent.storyText = storyBlockTexts[coord];
+                            }
+                            else
+                            {
+                                blockComponent.storyText = "You discovered a piece of the story!";
+                            }
+
+                            //Collider col = block.GetComponent<Collider>();
+                            //if (col != null) col.enabled = false; 
+                        }
                     }
                     else
                     {
@@ -557,7 +601,9 @@ public class LevelBuilder : MonoBehaviour
             case 7:
                 return "blockwlight";
             case 8:
-                return "pushable"; 
+                return "pushable";
+            case 9:
+                return "story";
             default:
                 return "unknown";
         }
@@ -569,7 +615,8 @@ public class LevelBuilder : MonoBehaviour
         {
             "empty",
             "right ladder",
-            "left ladder"
+            "left ladder",
+            "story"
         };
     }
 }

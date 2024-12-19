@@ -50,6 +50,13 @@ MonoBehaviour:
   switchOn: 0
   isActive: 1
   blockType: right ladder
+  isPushable: 0
+  isPullable: 0
+  indicator: {fileID: 0}
+  storyText: 
+  rotationSpeed: 20
+  bobSpeed: 2
+  bobHeight: 0.1
 --- !u!95 &3519711720958169798
 Animator:
   serializedVersion: 5
@@ -78,7 +85,7 @@ MeshRenderer:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2330442209979241904}
-  m_Enabled: 0
+  m_Enabled: 1
   m_CastShadows: 1
   m_ReceiveShadows: 1
   m_DynamicOccludee: 1
@@ -177,6 +184,14 @@ PrefabInstance:
       propertyPath: m_Materials.Array.data[0]
       value: 
       objectReference: {fileID: 2100000, guid: e6b9b44320f4448d9d5e0ee634259966, type: 2}
+    - target: {fileID: 4640774416751235552, guid: 748273c600199304da355c2dbabff149, type: 3}
+      propertyPath: m_Enabled
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5201782472904886081, guid: 748273c600199304da355c2dbabff149, type: 3}
+      propertyPath: m_Enabled
+      value: 0
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []

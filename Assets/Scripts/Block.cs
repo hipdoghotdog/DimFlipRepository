@@ -18,6 +18,13 @@ public class Block : MonoBehaviour
     public GameObject indicator; // Assign in the Inspector for levers only
     private MeshRenderer indicatorRenderer;
 
+    //Story Blocks
+    public string storyText = "";
+    private Vector3 initialPosition;
+    public float rotationSpeed = 20f;   // Degrees per second
+    public float bobSpeed = 2f;         // Speed of the up/down bob
+    public float bobHeight = 0.1f;      // Height amplitude of the bob
+
     void Start()
     {
         _blockAnim = GetComponent<Animator>();
@@ -49,6 +56,23 @@ public class Block : MonoBehaviour
                 Debug.LogWarning("Indicator GameObject is not assigned in the Block script for a lever block.");
             }
         }
+
+        // Store initial position for bobbing
+        initialPosition = transform.position;
+    }
+
+    void Update()
+    {
+        // Only apply animation if this is a story block
+        if (blockType.ToLower() == "story")
+        {
+            // Rotate around the Y-axis
+            transform.Rotate(Vector3.up, rotationSpeed * Time.deltaTime, Space.World);
+
+            // Bob up and down
+            float bobOffset = Mathf.Sin(Time.time * bobSpeed) * bobHeight;
+            transform.position = initialPosition + new Vector3(0, bobOffset, 0);
+        }
     }
 
     public void ApplyTheme()
@@ -59,30 +83,37 @@ public class Block : MonoBehaviour
         
         switch (blockType.ToLower())
         {
-            case "block":
-            case "blockwlight":
-            case "lever":
-                _meshRenderer.material = theme.blockMaterial;
-                break;
-            case "empty":
-                _meshRenderer.material = null;
-                break;
-            case "start":
-                _meshRenderer.material = theme.startMaterial;
-                break;
-            case "end":
-                _meshRenderer.material = theme.endMaterial;
-                break;
-            case "right ladder":
-            case "left ladder":
-                _meshRenderer.material = theme.ladderMaterial;
-                break;
-            case "pushable":
-                _meshRenderer.material = theme.pushableMaterial;
-                break;
-            default:
-                Debug.LogWarning($"Block: Unknown blockType '{blockType}'. No material applied.");
-                break;
+            switch (blockType.ToLower())
+            {
+                case "block":
+                case "blockwlight":
+                case "lever":
+                    meshRenderer.material = theme.blockMaterial;
+                    break;
+                case "empty":
+                    meshRenderer.material = null;
+                    meshRenderer.enabled = false;
+                    break;
+                case "start":
+                    meshRenderer.material = theme.startMaterial;
+                    break;
+                case "end":
+                    meshRenderer.material = theme.endMaterial;
+                    break;
+                case "right ladder":
+                case "left ladder":
+                    meshRenderer.material = theme.ladderMaterial;
+                    break;
+                case "pushable":
+                    meshRenderer.material = theme.pushableMaterial;
+                    break;
+                case "story":
+                    meshRenderer.material = theme.storyMaterial;
+                    break;
+                default:
+                    Debug.LogWarning($"Block: Unknown blockType '{blockType}'. No material applied.");
+                    break;
+            }
         }
     }
 

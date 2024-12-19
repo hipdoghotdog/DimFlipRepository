@@ -81,21 +81,22 @@ public class PlayerMovement : MonoBehaviour
 
     private void HandleInput()
     {
-        if (Input.GetKeyDown(KeyCode.RightArrow))
+        // Check horizontal movement
+        if (Input.GetKey(KeyCode.RightArrow))
         {
             TryMoveHorizontal(1, Quaternion.Euler(0, 0, 0));
         }
-        else if (Input.GetKeyDown(KeyCode.LeftArrow))
+        else if (Input.GetKey(KeyCode.LeftArrow))
         {
             TryMoveHorizontal(-1, Quaternion.Euler(0, 180, 0));
         }
         else if (_gameManager.currentView == View.TopdownView)
         {
-            if (Input.GetKeyDown(KeyCode.UpArrow))
+            if (Input.GetKey(KeyCode.UpArrow))
             {
                 TryMoveVertical(1, Quaternion.Euler(0, -90, 0));
             }
-            else if (Input.GetKeyDown(KeyCode.DownArrow))
+            else if (Input.GetKey(KeyCode.DownArrow))
             {
                 TryMoveVertical(-1, Quaternion.Euler(0, 90, 0));
             }
@@ -153,6 +154,35 @@ public class PlayerMovement : MonoBehaviour
             // Check if the target position is steppable
             if (CanIStepOnBlock(toPosSame) && (currentPosition.y == maxY || !CanIStepOnBlock(toPosSame + Vector3.up)))
             {
+                Vector3 blockPosition = toPosSame + Vector3.up;
+                Block blockAtToPosSame = gameManager.GetBlock(blockPosition);
+                if (blockAtToPosSame != null && blockAtToPosSame.GetBlockType() == "story")
+                {
+                    const float yThreshold = 0.2f;
+
+                    // Calculate the expected Y-position
+                    float expectedY = currentPosition.y + 1f;
+                    float actualY = blockAtToPosSame.transform.position.y;
+
+                    // Check if the actual Y-position is within the acceptable range
+                    if (Mathf.Abs(actualY - expectedY) < yThreshold)
+                    {
+                        gameManager.am.DisplayText(blockAtToPosSame.storyText);
+
+                        blockAtToPosSame.blockType = "empty";
+                        blockAtToPosSame.ApplyTheme();
+
+                        int x = Mathf.RoundToInt(blockPosition.x);
+                        int y = Mathf.RoundToInt(blockPosition.y);
+                        int z = Mathf.RoundToInt(blockPosition.z);
+                        GameObject oldBlock = gameManager.current_level[x, y, z];
+                        Destroy(oldBlock);
+
+                        GameObject newBlock = Instantiate(gameManager.lb.blockTemplates[0], new Vector3(x, y, z), Quaternion.identity);
+                        gameManager.current_level[x, y, z] = newBlock;
+                    }
+                }
+
                 newPosition += new Vector3(xIncrement, 0, 0);
                 StartMovement(newPosition, desiredRotation);
             }
@@ -162,8 +192,10 @@ public class PlayerMovement : MonoBehaviour
                 Vector3 blockPosition = toPosSame + Vector3.up;
                 Block blockAtToPosSame = GetBlock(blockPosition);
 
+                Debug.LogWarning(blockAtToPosSame.GetBlockType());
+
                 // Check if the block is pushable and on the correct level
-                if (blockAtToPosSame != null && blockAtToPosSame.isPushable && Mathf.Approximately(blockAtToPosSame.transform.position.y, currentPosition.y + 1))
+                if (blockAtToPosSame != null  && Mathf.Approximately(blockAtToPosSame.transform.position.y, currentPosition.y + 1))
                 {
                     // Calculate the position ahead of the pushable block
                     Vector3 pushBlockTargetPos = blockPosition + new Vector3(xIncrement, 0, 0); // Maintain the y-offset
@@ -186,19 +218,19 @@ public class PlayerMovement : MonoBehaviour
                             playerAnimator.SetTrigger("Push");
                             SoundManager.Instance.PlaySound(Sound.Push);
 
-                            // Move the blocks
-                            MoveBlock(blockAtToPosSame, pushBlockTargetPos);
-                            MoveBlock(targetBlock, blockPosition);
+                                // Move the blocks
+                                MoveBlock(blockAtToPosSame, pushBlockTargetPos);
+                                MoveBlock(targetBlock, blockPosition);
 
-                            // Update the level array
-                            Vector3Int targetPos = Vector3Int.RoundToInt(pushBlockTargetPos);
-                            Vector3Int currentPos = Vector3Int.RoundToInt(blockPosition);
+                                // Update the level array
+                                Vector3Int targetPos = Vector3Int.RoundToInt(pushBlockTargetPos);
+                                Vector3Int currentPos = Vector3Int.RoundToInt(blockPosition);
 
-                            // Swap the blocks in the level array
-                            (_gameManager.CurrentLevel[targetPos.x, targetPos.y, targetPos.z],
-                             _gameManager.CurrentLevel[currentPos.x, currentPos.y, currentPos.z]) =
-                                (_gameManager.CurrentLevel[currentPos.x, currentPos.y, currentPos.z],
-                                 _gameManager.CurrentLevel[targetPos.x, targetPos.y, targetPos.z]);
+                                // Swap the blocks in the level array
+                                (_gameManager.CurrentLevel[targetPos.x, targetPos.y, targetPos.z],
+                                _gameManager.CurrentLevel[currentPos.x, currentPos.y, currentPos.z]) =
+                                    (_gameManager.CurrentLevel[currentPos.x, currentPos.y, currentPos.z],
+                                    _gameManager.CurrentLevel[targetPos.x, targetPos.y, targetPos.z]);
 
                             // Move the player to the position of the block
                             newPosition += new Vector3(xIncrement, 0, 0);
