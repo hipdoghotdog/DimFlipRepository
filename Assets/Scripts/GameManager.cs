@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using UnityEngine;
+using UnityEngine.EventSystems;
 using UnityEngine.SceneManagement;
 
 public class GameManager : MonoBehaviour
@@ -53,7 +54,7 @@ public class GameManager : MonoBehaviour
 
     private void Start()
     {
-        LoadLevel(9);
+        LoadLevel(currentLevelIndex);
     }
 
     private void Update()
@@ -68,9 +69,9 @@ public class GameManager : MonoBehaviour
             ResetLevel();
         }
 
-        if (Input.GetKeyDown(KeyCode.Escape))
+        else if (Input.GetKeyDown(KeyCode.Escape))
         {
-           MenuManager.Instance.ToggleMenu(); 
+           MenuManager.Instance.ToggleMenu();
         }
     }
 
@@ -84,6 +85,8 @@ public class GameManager : MonoBehaviour
 
         // Initialize managers after the scene is loaded
         SceneManager.sceneLoaded += OnSceneLoaded;
+        
+        EventSystem.current.SetSelectedGameObject(null);
     }
 
     private void ResetLevel()

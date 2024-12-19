@@ -101,9 +101,4 @@ public class MenuManager : MonoBehaviour
     {
         menuCanvas.enabled = !menuCanvas.enabled;
     }
-
-    public void Say()
-    {
-        Debug.Log("Say hi!");
-    }
 }
