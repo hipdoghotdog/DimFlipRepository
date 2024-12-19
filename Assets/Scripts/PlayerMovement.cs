@@ -1,6 +1,5 @@
 using System.Collections;
 using System.Collections.Generic;
-using DefaultNamespace;
 using UnityEngine;
 using static GameManager;
 
@@ -153,7 +152,7 @@ public class PlayerMovement : MonoBehaviour
                         int x = Mathf.RoundToInt(blockPosition.x);
                         int y = Mathf.RoundToInt(blockPosition.y);
                         int z = Mathf.RoundToInt(blockPosition.z);
-                        _gameManager.CurrentLevel[x, y, z] = _gameManager.levelBuilder.blockTemplates[0];
+                        _gameManager.CurrentLevel[x, y, z] = _gameManager.levelBuilder.BlockTemplates[0];
                     }
                 }
 

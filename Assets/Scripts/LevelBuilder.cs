@@ -1,7 +1,6 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using DefaultNamespace;
 using UnityEngine;
 using UnityEngine.Serialization;
 
@@ -209,6 +208,29 @@ public class LevelBuilder : MonoBehaviour
                 { { 0, 0, 0, 0, 0, 0, 0 }, { 1, 1, 3, 0, 0, 0, 0 }, { 0, 0, 0, 0, 0, 0, 0 }, { 0, 0, 0, 0, 0, 0, 0 }, { 0, 0, 0, 0, 0, 0, 0 } },
             }
         ));
+        
+        Levels.Add(11, new LevelData(
+            new [,,]
+            {
+                { {2}, {0} },
+                { {1}, {0} },
+                { {1}, {9} },
+                { {1}, {0} },
+                { {1}, {9} },
+                { {1}, {0} },
+                { {1}, {9} },
+                { {1}, {0} },
+                { {1}, {9} },
+                { {3}, {0} },
+            },
+            storyBlocks: new Dictionary<Vector3Int, string>
+            {
+                { new Vector3Int(2, 1, 0), "HELLO" },
+                { new Vector3Int(4, 1, 0), "HELLO THERE" },
+                { new Vector3Int(6, 1, 0), "HELLO AGAIN" },
+                { new Vector3Int(8, 1, 0), "123" }
+            }
+        ));
     }
     
     private void BuildDictionary()
@@ -296,9 +318,9 @@ public class LevelBuilder : MonoBehaviour
                         {
                             
                             Vector3Int coord = new Vector3Int(i, k, j);
-                            if (storyBlockTexts.ContainsKey(coord))
+                            if (Levels[gameManager.currentLevelIndex].StoryBlocks.ContainsKey(coord))
                             {
-                                blockComponent.storyText = storyBlockTexts[coord];
+                                blockComponent.storyText = Levels[gameManager.currentLevelIndex].StoryBlocks[coord];
                             }
                             else
                             {
@@ -364,26 +386,3 @@ public class LevelBuilder : MonoBehaviour
         };
     }
 }
-
-
-    void testlevel()
-    {
-        levelTemplate = new int[,,] {
-            { {2}, {0} },
-            { {1}, {0} },
-            { {1}, {9} },
-            { {1}, {0} },
-            { {1}, {9} },
-            { {1}, {0} },
-            { {1}, {9} },
-            { {1}, {0} },
-            { {1}, {9} },
-            { {3}, {0} },
-        };
-
-        storyBlockTexts.Clear();
-        storyBlockTexts.Add(new Vector3Int(2, 1, 0), "HELLO"); //(SIDEVIEW DIRECTION, HEIGHT, TOPVIEW DIRECTION)
-        storyBlockTexts.Add(new Vector3Int(4, 1, 0), "HELLO THERE");
-        storyBlockTexts.Add(new Vector3Int(6, 1, 0), "HELLO AGAIN");
-        storyBlockTexts.Add(new Vector3Int(8, 1, 0), "123");
-    }

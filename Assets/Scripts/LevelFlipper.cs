@@ -2,16 +2,15 @@ using UnityEngine;
 
 public class LevelFlipper : MonoBehaviour
 {
-    [HideInInspector]
-    public GameManager gameManager;
+    private GameManager _gameManager;
 
     private GameObject[,,] _level;
     private bool _init;
 
     public void Initialize()
     {
-        gameManager = GameManager.Instance;
-        _level = gameManager.CurrentLevel;
+        _gameManager = GameManager.Instance;
+        _level = _gameManager.CurrentLevel;
     }
 
     private void Update()
@@ -45,11 +44,11 @@ public class LevelFlipper : MonoBehaviour
     {
         ActivateBlocks(); 
 
-        gameManager.cameraScript.camAnimator.SetTrigger(gameManager.currentView == GameManager.View.TopdownView
+        _gameManager.cameraScript.camAnimator.SetTrigger(_gameManager.currentView == GameManager.View.TopdownView
             ? "FlipToTopView"
             : "FlipToSideView");
 
-        gameManager.cameraScript.FlipView(gameManager.currentView);
+        _gameManager.cameraScript.FlipView(_gameManager.currentView);
     }
 
     private void ActivateBlocks()
@@ -86,7 +85,7 @@ public class LevelFlipper : MonoBehaviour
                         continue; // Skip blocks without a Block component
                     }
 
-                    if (gameManager.currentView == GameManager.View.SideView)
+                    if (_gameManager.currentView == GameManager.View.SideView)
                     {
                         bool onHeightPlane = Mathf.RoundToInt(blockObj.transform.position.y) == playerPositionY;
                         blockComponent.Activate(onHeightPlane);
@@ -101,7 +100,7 @@ public class LevelFlipper : MonoBehaviour
         }
         
         // Update the global currentView variable
-        gameManager.currentView = gameManager.currentView == GameManager.View.SideView
+        _gameManager.currentView = _gameManager.currentView == GameManager.View.SideView
             ? GameManager.View.TopdownView 
             : GameManager.View.SideView;
     }
