@@ -62,6 +62,9 @@ public class ArtifactManager : MonoBehaviour
         }
 
         camToLookAt = GameObject.Find("Camera").transform; // If camera object is renamed, this breaks
+        
+        Vector3 startPosition = GameManager.Instance.levelBuilder.StartBlockPosition;
+        transform.position = startPosition + offset;
     }
 
     void Update()
