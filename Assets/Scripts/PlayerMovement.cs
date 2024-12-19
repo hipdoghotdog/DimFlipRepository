@@ -24,6 +24,11 @@ public class PlayerMovement : MonoBehaviour
         _gameManager = Instance;
     }
 
+    public void Initialize()
+    {
+        ResetPlayerPosition();
+    }
+
     private void Update()
     {
         transform.rotation = Quaternion.RotateTowards(
@@ -31,7 +36,7 @@ public class PlayerMovement : MonoBehaviour
             _targetRotation,
             rotationSpeed * Time.deltaTime
         );
-
+        
         if (!isMoving)
         {
             HandleInput();
@@ -289,5 +294,15 @@ public class PlayerMovement : MonoBehaviour
                 return GetBlock(playerPos + Vector3.left).GetBlockType() == "right ladder";
         }
         return false;
+    }
+
+    private void ResetPlayerPosition()
+    {
+        Vector3 startPosition = _gameManager.levelBuilder.StartBlockPosition;
+        transform.position = startPosition;
+        _targetPosition = startPosition;
+        isMoving = true;
+        playerAnimator.SetBool("isWalking", true);
+        _targetRotation = Quaternion.identity;
     }
 }

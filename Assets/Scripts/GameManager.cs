@@ -1,3 +1,5 @@
+using System;
+using System.Collections;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
@@ -54,6 +56,19 @@ public class GameManager : MonoBehaviour
         LoadLevel(currentLevelIndex);
     }
 
+    private void Update()
+    {
+        HandleInput();
+    }
+
+    private void HandleInput()
+    {
+        if (Input.GetKeyDown(KeyCode.Backspace))
+        {
+            ResetLevel();
+        }
+    }
+
     private void LoadLevel(int levelIndex)
     {
         currentLevelIndex = levelIndex;
@@ -64,6 +79,11 @@ public class GameManager : MonoBehaviour
 
         // Initialize managers after the scene is loaded
         SceneManager.sceneLoaded += OnSceneLoaded;
+    }
+
+    private void ResetLevel()
+    {
+        LoadLevel(currentLevelIndex);
     }
 
     private void OnSceneLoaded(Scene scene, LoadSceneMode mode)
@@ -87,6 +107,7 @@ public class GameManager : MonoBehaviour
         if (levelBuilder) levelBuilder.Initialize(currentLevelIndex);
         if (levelFlipper) levelFlipper.Initialize();
         if (artifactManager) artifactManager.Initialize();
+        if (playerMovement) playerMovement.Initialize();
     }
 
     public void NextLevel()
@@ -101,13 +122,13 @@ public class GameManager : MonoBehaviour
         {
             blocksFell = false;
 
-            for (int x = 0; x < current_level.GetLength(0); x++)
+            for (int x = 0; x < CurrentLevel.GetLength(0); x++)
             {
-                for (int y = 0; y < current_level.GetLength(1); y++)
+                for (int y = 0; y < CurrentLevel.GetLength(1); y++)
                 {
-                    for (int z = 0; z < current_level.GetLength(2); z++)
+                    for (int z = 0; z < CurrentLevel.GetLength(2); z++)
                     {
-                        GameObject go = current_level[x, y, z];
+                        GameObject go = CurrentLevel[x, y, z];
                         if (go == null) continue;
 
                         Block block = go.GetComponent<Block>();
@@ -122,19 +143,19 @@ public class GameManager : MonoBehaviour
                                 Vector3 fallOutPos = new Vector3(x, -1, z);
                                 StartCoroutine(FallOutOfLevelCoroutine(go, fallOutPos));
 
-                                current_level[x, y, z] = null;
+                                CurrentLevel[x, y, z] = null;
                                 blocksFell = true;
                             }
                             else
                             {
                                 // Check if below is empty
-                                GameObject belowBlockGO = current_level[x, belowY, z];
+                                GameObject belowBlockGO = CurrentLevel[x, belowY, z];
                                 if (belowBlockGO == null)
                                 {
                                     // Just fall down
                                     StartCoroutine(MoveBlockCoroutine(block, new Vector3(x, belowY, z)));
-                                    current_level[x, belowY, z] = go;
-                                    current_level[x, y, z] = null;
+                                    CurrentLevel[x, belowY, z] = go;
+                                    CurrentLevel[x, y, z] = null;
                                     blocksFell = true;
                                 }
                                 else
@@ -144,8 +165,8 @@ public class GameManager : MonoBehaviour
                                     {
                                         // Swap with empty block
                                         StartCoroutine(MoveBlockCoroutine(block, new Vector3(x, belowY, z)));
-                                        current_level[x, belowY, z] = go;
-                                        current_level[x, y, z] = belowBlockGO;
+                                        CurrentLevel[x, belowY, z] = go;
+                                        CurrentLevel[x, y, z] = belowBlockGO;
                                         blocksFell = true;
                                     }
                                 }
@@ -183,7 +204,7 @@ public class GameManager : MonoBehaviour
     }
 
     // New coroutine for falling out of the level
-    public IEnumerator FallOutOfLevelCoroutine(GameObject blockGO, Vector3 targetPosition)
+    private IEnumerator FallOutOfLevelCoroutine(GameObject blockGO, Vector3 targetPosition)
     {
         Block block = blockGO.GetComponent<Block>();
         if (block == null) yield break;
