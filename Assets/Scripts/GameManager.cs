@@ -53,7 +53,7 @@ public class GameManager : MonoBehaviour
 
     private void Start()
     {
-        LoadLevel(currentLevelIndex);
+        LoadLevel(9);
     }
 
     private void Update()

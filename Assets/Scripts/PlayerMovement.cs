@@ -48,7 +48,14 @@ public class PlayerMovement : MonoBehaviour
 
     private Block GetBlock(Vector3 position)
     {
-        return _gameManager.CurrentLevel[(int)position.x, (int)position.y, (int)position.z].GetComponent<Block>();
+        try
+        {
+            return _gameManager.CurrentLevel[(int)position.x, (int)position.y, (int)position.z].GetComponent<Block>();
+        }
+        catch
+        {
+            return null;
+        }
     }
 
     private bool CanIStepOnBlock(Vector3 position)
