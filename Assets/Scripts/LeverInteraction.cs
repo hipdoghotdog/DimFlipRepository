@@ -126,8 +126,12 @@ public class LeverInteractionScript : MonoBehaviour
 
         // Refresh the level state
         _gameManager.levelFlipper.RefreshLevel();
-
-        _gameManager.levelBuilder.Levels[_gameManager.currentLevelIndex].InterActPairs[num] = c[0] * 1000 + (c[1] + i) * 100 + c[2] * 10 + c[3];
+        if (c[3] < 3)
+        {
+            _gameManager.levelBuilder.Levels[_gameManager.currentLevelIndex].InterActPairs[num] = c[0] * 1000 + (c[1] + i) * 100 + c[2] * 10 + c[3];
+        }
+        else
+            _gameManager.levelBuilder.Levels[_gameManager.currentLevelIndex].InterActPairs[num] = (c[0] + i) * 1000 + c[1] * 100 + c[2] * 10 + c[3];
 
         // Play lever sound
         SoundManager.Instance.PlaySound(Sound.Lever);
