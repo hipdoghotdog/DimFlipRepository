@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 using UnityEngine.EventSystems;
@@ -11,6 +12,8 @@ public class MenuManager : MonoBehaviour
     public Transform buttonsParent; // Parent object with a GridLayoutGroup
     public Canvas menuCanvas;
     public EventSystem eventSystem;
+
+    public Dictionary<int, Button> buttonDictionary = new Dictionary<int, Button>();
     
     private readonly int[] _levels = Enumerable.Range(0, 10).ToArray();
 
@@ -82,6 +85,9 @@ public class MenuManager : MonoBehaviour
         {
             Debug.LogError("MenuManager: Button " + level + " not found.");
         }
+        
+        buttonDictionary.Add(currentLevel, buttonComponent);
+        buttonComponent.interactable = false;
     }
 
     private void LoadLevel(int level)

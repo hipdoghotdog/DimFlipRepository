@@ -1,5 +1,7 @@
 using System;
 using System.Collections;
+using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.SceneManagement;
@@ -32,12 +34,14 @@ public class GameManager : MonoBehaviour
 
     [HideInInspector]
     public View currentView;
-    
+
     public enum View
     {
         SideView,
         TopdownView
     }
+    
+    [HideInInspector] public HashSet<int> CompletedLevels = new HashSet<int>();
 
     private void Awake()
     {
@@ -78,6 +82,9 @@ public class GameManager : MonoBehaviour
     public void LoadLevel(int levelIndex)
     {
         currentLevelIndex = levelIndex;
+        
+        MenuManager.Instance.buttonDictionary[levelIndex].interactable = true;
+        
         currentView = View.SideView;
 
         // Load the scene corresponding to the level
@@ -120,6 +127,7 @@ public class GameManager : MonoBehaviour
 
     public void NextLevel()
     {
+        CompletedLevels.Add(currentLevelIndex);
         LoadLevel(currentLevelIndex + 1);
     }
 
