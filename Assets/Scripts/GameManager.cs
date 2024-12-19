@@ -67,9 +67,14 @@ public class GameManager : MonoBehaviour
         {
             ResetLevel();
         }
+
+        if (Input.GetKeyDown(KeyCode.Escape))
+        {
+           MenuManager.Instance.ToggleMenu(); 
+        }
     }
 
-    private void LoadLevel(int levelIndex)
+    public void LoadLevel(int levelIndex)
     {
         currentLevelIndex = levelIndex;
         currentView = View.SideView;
@@ -218,7 +223,4 @@ public class GameManager : MonoBehaviour
             Destroy(blockGO);
         }
     }
-
-
-
 }
