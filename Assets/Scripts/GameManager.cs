@@ -6,7 +6,7 @@ using UnityEngine.SceneManagement;
 
 public class GameManager : MonoBehaviour
 {
-    public int STARTLEVEL = 7;
+    public int STARTLEVEL = 0;
 
     public LevelBuilder lb;
     public LevelFlipper lf;

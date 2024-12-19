@@ -137,6 +137,31 @@ public class PlayerMovement : MonoBehaviour
             // Check if the target position is steppable
             if (CanIStepOnBlock(toPosSame) && (currentPosition.y == maxY || !CanIStepOnBlock(toPosSame + Vector3.up)))
             {
+                Vector3 blockPosition = toPosSame + Vector3.up;
+                Block blockAtToPosSame = gameManager.GetBlock(blockPosition);
+                if (blockAtToPosSame != null && blockAtToPosSame.GetBlockType() == "story")
+                {
+                    const float yThreshold = 0.2f;
+
+                    // Calculate the expected Y-position
+                    float expectedY = currentPosition.y + 1f;
+                    float actualY = blockAtToPosSame.transform.position.y;
+
+                    // Check if the actual Y-position is within the acceptable range
+                    if (Mathf.Abs(actualY - expectedY) < yThreshold)
+                    {
+                        gameManager.am.DisplayText(blockAtToPosSame.storyText);
+
+                        blockAtToPosSame.blockType = "empty";
+                        blockAtToPosSame.ApplyTheme();
+
+                        int x = Mathf.RoundToInt(blockPosition.x);
+                        int y = Mathf.RoundToInt(blockPosition.y);
+                        int z = Mathf.RoundToInt(blockPosition.z);
+                        gameManager.current_level[x, y, z] = gameManager.lb.blockTemplates[0];
+                    }
+                }
+
                 newPosition += new Vector3(xIncrement, 0, 0);
                 StartMovement(newPosition, desiredRotation);
                 return true;
@@ -147,48 +172,52 @@ public class PlayerMovement : MonoBehaviour
                 Vector3 blockPosition = toPosSame + Vector3.up;
                 Block blockAtToPosSame = gameManager.GetBlock(blockPosition);
 
+                Debug.LogWarning(blockAtToPosSame.GetBlockType());
+
                 // Check if the block is pushable and on the correct level
-                if (blockAtToPosSame != null && blockAtToPosSame.isPushable && Mathf.Approximately(blockAtToPosSame.transform.position.y, currentPosition.y + 1))
+                if (blockAtToPosSame != null  && Mathf.Approximately(blockAtToPosSame.transform.position.y, currentPosition.y + 1))
                 {
-                    // Calculate the position ahead of the pushable block
-                    Vector3 pushBlockTargetPos = blockPosition + new Vector3(xIncrement, 0, 0); // Maintain the y-offset
+                    if (blockAtToPosSame.isPushable) { 
+                        // Calculate the position ahead of the pushable block
+                        Vector3 pushBlockTargetPos = blockPosition + new Vector3(xIncrement, 0, 0); // Maintain the y-offset
 
-                    // Check if the position ahead is within bounds
-                    int maxX = gameManager.current_level.GetLength(0) - 1;
-                    int maxZ = gameManager.current_level.GetLength(2) - 1;
-                    maxY = gameManager.current_level.GetLength(1) - 1;
+                        // Check if the position ahead is within bounds
+                        int maxX = gameManager.current_level.GetLength(0) - 1;
+                        int maxZ = gameManager.current_level.GetLength(2) - 1;
+                        maxY = gameManager.current_level.GetLength(1) - 1;
 
-                    if (pushBlockTargetPos.x >= 0 && pushBlockTargetPos.x <= maxX &&
-                        pushBlockTargetPos.z >= 0 && pushBlockTargetPos.z <= maxZ &&
-                        pushBlockTargetPos.y >= 0 && pushBlockTargetPos.y <= maxY)
-                    {
-                        // Check if the block at the target position is null or empty
-                        Block targetBlock = gameManager.GetBlock(pushBlockTargetPos);
-
-                        if (targetBlock == null || targetBlock.blockType.ToLower() == "empty")
+                        if (pushBlockTargetPos.x >= 0 && pushBlockTargetPos.x <= maxX &&
+                            pushBlockTargetPos.z >= 0 && pushBlockTargetPos.z <= maxZ &&
+                            pushBlockTargetPos.y >= 0 && pushBlockTargetPos.y <= maxY)
                         {
-                            //
-                            playerAnimator.SetTrigger("Push");
-                            SoundManager.instance.PlaySound(Sound.PUSH);
+                            // Check if the block at the target position is null or empty
+                            Block targetBlock = gameManager.GetBlock(pushBlockTargetPos);
 
-                            // Move the blocks
-                            MoveBlock(blockAtToPosSame, pushBlockTargetPos);
-                            MoveBlock(targetBlock, blockPosition);
+                            if (targetBlock == null || targetBlock.blockType.ToLower() == "empty")
+                            {
+                                //
+                                playerAnimator.SetTrigger("Push");
+                                SoundManager.instance.PlaySound(Sound.PUSH);
+
+                                // Move the blocks
+                                MoveBlock(blockAtToPosSame, pushBlockTargetPos);
+                                MoveBlock(targetBlock, blockPosition);
 
 
-                            // Update the level array
-                            GameObject temp = gameManager.current_level[(int)pushBlockTargetPos.x, (int)pushBlockTargetPos.y, (int)pushBlockTargetPos.z];
+                                // Update the level array
+                                GameObject temp = gameManager.current_level[(int)pushBlockTargetPos.x, (int)pushBlockTargetPos.y, (int)pushBlockTargetPos.z];
                             
-                            gameManager.current_level[(int)pushBlockTargetPos.x, (int)pushBlockTargetPos.y, (int)pushBlockTargetPos.z] =
-                                gameManager.current_level[(int)blockPosition.x, (int)blockPosition.y, (int)blockPosition.z];
+                                gameManager.current_level[(int)pushBlockTargetPos.x, (int)pushBlockTargetPos.y, (int)pushBlockTargetPos.z] =
+                                    gameManager.current_level[(int)blockPosition.x, (int)blockPosition.y, (int)blockPosition.z];
 
-                            gameManager.current_level[(int)blockPosition.x, (int)blockPosition.y, (int)blockPosition.z] = temp;
+                                gameManager.current_level[(int)blockPosition.x, (int)blockPosition.y, (int)blockPosition.z] = temp;
 
 
-                            // Move the player to the position of the block
-                            newPosition += new Vector3(xIncrement, 0, 0);
-                            StartMovement(newPosition, desiredRotation, false, false);
-                            return true;
+                                // Move the player to the position of the block
+                                newPosition += new Vector3(xIncrement, 0, 0);
+                                StartMovement(newPosition, desiredRotation, false, false);
+                                return true;
+                            }
                         }
                     }
                 }

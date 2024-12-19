@@ -18,6 +18,7 @@ MonoBehaviour:
   ladderMaterial: {fileID: 2100000, guid: e6b9b44320f4448d9d5e0ee634259966, type: 2}
   leverMaterial: {fileID: 2100000, guid: 16292699e5eeafa438350c4c14cd55f8, type: 2}
   pushableMaterial: {fileID: 2100000, guid: e6b9b44320f4448d9d5e0ee634259966, type: 2}
+  storyMaterial: {fileID: 2100000, guid: 428d6b2f56d2e4db0a29ae394b8955f6, type: 2}
   blockModel: {fileID: 3946397339657139063, guid: 0c1284c68d873dd498f7e7cf52d13806, type: 3}
   emptyModel: {fileID: 924742702580361081, guid: e4d5c42bb10e1b54894082a9af18050a, type: 3}
   startModel: {fileID: 3946397339657139063, guid: 9f5e215005ea47a4ca0ba5ddcc7f3c3d, type: 3}
@@ -26,3 +27,4 @@ MonoBehaviour:
   leverModel: {fileID: 3946397339657139063, guid: b6e972883889df84cb0f4e80de245b88, type: 3}
   blockwlightModel: {fileID: 3946397339657139063, guid: 0e0b389c448dad543a83814e2495d4b8, type: 3}
   pushableModel: {fileID: 3946397339657139063, guid: 343870a6675c00f408c46ec7c94216f2, type: 3}
+  storyModel: {fileID: 3946397339657139063, guid: 1c6c1638d4d929847a91fb2a2fad017a, type: 3}

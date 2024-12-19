@@ -16,6 +16,13 @@ public class Block : MonoBehaviour
     public GameObject indicator; // Assign in the Inspector for levers only
     private MeshRenderer indicatorRenderer;
 
+    //Story Blocks
+    public string storyText = "";
+    private Vector3 initialPosition;
+    public float rotationSpeed = 20f;   // Degrees per second
+    public float bobSpeed = 2f;         // Speed of the up/down bob
+    public float bobHeight = 0.1f;      // Height amplitude of the bob
+
     void Start()
     {
         blockAnim = GetComponent<Animator>();
@@ -47,6 +54,23 @@ public class Block : MonoBehaviour
                 Debug.LogWarning("Indicator GameObject is not assigned in the Block script for a lever block.");
             }
         }
+
+        // Store initial position for bobbing
+        initialPosition = transform.position;
+    }
+
+    void Update()
+    {
+        // Only apply animation if this is a story block
+        if (blockType.ToLower() == "story")
+        {
+            // Rotate around the Y-axis
+            transform.Rotate(Vector3.up, rotationSpeed * Time.deltaTime, Space.World);
+
+            // Bob up and down
+            float bobOffset = Mathf.Sin(Time.time * bobSpeed) * bobHeight;
+            transform.position = initialPosition + new Vector3(0, bobOffset, 0);
+        }
     }
 
     public void ApplyTheme()
@@ -63,6 +87,7 @@ public class Block : MonoBehaviour
                     break;
                 case "empty":
                     meshRenderer.material = null;
+                    meshRenderer.enabled = false;
                     break;
                 case "start":
                     meshRenderer.material = theme.startMaterial;
@@ -76,6 +101,9 @@ public class Block : MonoBehaviour
                     break;
                 case "pushable":
                     meshRenderer.material = theme.pushableMaterial;
+                    break;
+                case "story":
+                    meshRenderer.material = theme.storyMaterial;
                     break;
                 default:
                     Debug.LogWarning($"Block: Unknown blockType '{blockType}'. No material applied.");
