@@ -84,7 +84,7 @@ public class ArtifactManager : MonoBehaviour
 
     private void FollowPlayer()
     {
-        if (followPos != null)
+        if (followPos)
         {
             Vector3 targetPosition = followPos.position + offset;
             transform.position = Vector3.MoveTowards(transform.position, targetPosition, speed * Time.deltaTime);
@@ -106,7 +106,7 @@ public class ArtifactManager : MonoBehaviour
         _displayActive = false;
         _displayCountdown = 0f;
         
-        if (_textMesh != null)
+        if (_textMesh)
         {
             _textMesh.text = "";
         }
@@ -114,7 +114,7 @@ public class ArtifactManager : MonoBehaviour
 
     public void DisplayText(string text)
     {
-        if (_textMesh != null)
+        if (_textMesh)
         {
             _displayActive = true;
             _displayCountdown = displayDuration;
@@ -129,7 +129,7 @@ public class ArtifactManager : MonoBehaviour
 
     private void PulseLight()
     {
-        if (_artifactLight == null) return;
+        if (!_artifactLight) return;
         
         // Calculate pulsing intensity using PingPong for smooth oscillation
         float pulsingIntensity = Mathf.PingPong(Time.time * pulseSpeed, pulseIntensityMax - pulseIntensityMin) + pulseIntensityMin;

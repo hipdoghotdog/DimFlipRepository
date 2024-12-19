@@ -23,8 +23,6 @@ public class LevelBuilder : MonoBehaviour
         InitializeLevels();
         BuildDictionary();
         BuildLevel(levelIndex);
-        
-        gameManager.artifactManager.DisplayText("Level: " + levelIndex);
     }
     
     private void InitializeLevels()
@@ -75,7 +73,7 @@ public class LevelBuilder : MonoBehaviour
             },
             storyBlocks: new Dictionary<Vector3Int, string>
             {
-                { new Vector3Int(3, 1, 0), "The path begins in confusion, but every step forward brings clarity—or so they say." },
+                { new Vector3Int(3, 1, 0), "The path begins in confusion, but every step forward brings clarity, or so they say." },
                 { new Vector3Int(2, 3, 2), "They are always watching. Tread carefully." },
             }
         ));

@@ -12,7 +12,7 @@ public class MenuManager : MonoBehaviour
     public Canvas menuCanvas;
     public EventSystem eventSystem;
     
-    private readonly int[] _levels = Enumerable.Range(0, 11).ToArray();
+    private readonly int[] _levels = Enumerable.Range(0, 10).ToArray();
 
     private void Awake()
     {
