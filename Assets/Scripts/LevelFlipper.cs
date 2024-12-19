@@ -1,77 +1,37 @@
+using System;
+using System.Collections;
+using System.Collections.Generic;
 using UnityEngine;
+//using UnityEngine.InputSystem;
 
 public class LevelFlipper : MonoBehaviour
 {
-    [HideInInspector]
-    public GameManager gameManager;
+    public GameObject[,,] level;
 
-    private GameObject[,,] _level;
-    private bool _init;
-
-    public void Initialize()
+    public void SetLevel(GameObject[,,] l)
     {
-        gameManager = GameManager.Instance;
-        _level = gameManager.CurrentLevel;
+        level = l;
     }
 
-    private void Update()
+    public void flipLevel(Vector3 pp, GameManager.View view)
     {
-        if (!_init)
+        if (level == null)
         {
-            _init = true;
-            RefreshLevel();
-        }
-        if (!GameManager.Instance.playerMovement.isMoving)
-        {
-            HandleInput();
-        }
-    }
-
-    private void HandleInput()
-    {
-        if (Input.GetKeyDown(KeyCode.Space))
-        {
-            Flip();
-        }
-    }
-
-    public void RefreshLevel()
-    {
-        ActivateBlocks();
-        ActivateBlocks();
-    }
-
-    private void Flip()
-    {
-        ActivateBlocks(); 
-
-        gameManager.cameraScript.camAnimator.SetTrigger(gameManager.currentView == GameManager.View.TopdownView
-            ? "FlipToTopView"
-            : "FlipToSideView");
-
-        gameManager.cameraScript.FlipView(gameManager.currentView);
-    }
-
-    private void ActivateBlocks()
-    {
-        if (_level == null)
-        {
-            Debug.LogError("LevelFlipper: Level array is null.");
+            Debug.LogError("LevelFlipper: Level array is null. Ensure that SetLevel() is called before flipLevel().");
             return;
         }
-        
-        Vector3 playerPosition = GameObject.Find("Player").transform.position;
 
-        int playerPositionY = Mathf.RoundToInt(playerPosition.y);
-        int playerPositionZ = Mathf.RoundToInt(playerPosition.z);
+        int ppx = Mathf.RoundToInt(pp.x);
+        int ppy = Mathf.RoundToInt(pp.y);
+        int ppz = Mathf.RoundToInt(pp.z);
 
-        for (int i = 0; i < _level.GetLength(0); i++)
+        for (int i = 0; i < level.GetLength(0); i++)
         {
-            for (int k = 0; k < _level.GetLength(1); k++)
+            for (int k = 0; k < level.GetLength(1); k++)
             {
-                for (int j = 0; j < _level.GetLength(2); j++)
+                for (int j = 0; j < level.GetLength(2); j++)
                 {
-                    GameObject blockObj = _level[i, k, j];
+                    GameObject blockObj = level[i, k, j];
 
                     if (blockObj == null)
                     {
@@ -86,23 +46,18 @@ public class LevelFlipper : MonoBehaviour
                         continue; // Skip blocks without a Block component
                     }
 
-                    if (gameManager.currentView == GameManager.View.SideView)
+                    if (view == GameManager.View.SideView)
                     {
-                        bool onHeightPlane = Mathf.RoundToInt(blockObj.transform.position.y) == playerPositionY;
+                        bool onHeightPlane = Mathf.RoundToInt(blockObj.transform.position.y) == ppy;
                         blockComponent.Activate(onHeightPlane);
                     }
                     else // TopdownView
                     {
-                        bool onSidePlane = Mathf.RoundToInt(blockObj.transform.position.z) == playerPositionZ;
+                        bool onSidePlane = Mathf.RoundToInt(blockObj.transform.position.z) == ppz;
                         blockComponent.Activate(onSidePlane);
                     }
                 }
             }
         }
-        
-        // Update the global currentView variable
-        gameManager.currentView = gameManager.currentView == GameManager.View.SideView
-            ? GameManager.View.TopdownView 
-            : GameManager.View.SideView;
     }
 }

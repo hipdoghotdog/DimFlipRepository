@@ -572,6 +572,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   emptyTemplate: {fileID: 924742702580361081, guid: 4eb5b32a313b8dd4980f0cae37d978f5, type: 3}
+  levelParent: {fileID: 1689230860}
+  currentLevel: 0
   startBlockPosition: {x: 0, y: 0, z: 0}
 --- !u!4 &658312666
 Transform:
@@ -783,7 +785,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b293af65a83b8424bbda52f1260d9a97, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  playerTransform: {fileID: 0}
+  player: {fileID: 1317029474}
   camAnimator: {fileID: 721669351}
   followSpeed: 5
   sideViewOffset: {x: 0, y: 3, z: -6}
@@ -5888,7 +5890,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b2fcb4a71ec3e4444bd6b761885a83cc, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  gameManager: {fileID: 0}
 --- !u!4 &1284599206
 Transform:
   m_ObjectHideFlags: 0
@@ -6435,14 +6436,16 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 73abbf8365b4bfc4bb27c44b8f25e54a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  currentLevelIndex: 0
-  STARTLEVEL: 7
-  levelBuilder: {fileID: 658312665}
-  levelFlipper: {fileID: 1284599205}
+  STARTLEVEL: 0
+  lb: {fileID: 658312665}
+  lf: {fileID: 1284599205}
   player: {fileID: 1317029473}
-  playerMovement: {fileID: 0}
-  cameraScript: {fileID: 0}
-  themeManager: {fileID: 0}
+  cam: {fileID: 721669347}
+  endScene: {fileID: 1465913575}
+  camAnimator: {fileID: 721669351}
+  playerAnimator: {fileID: 1962308937}
+  am: {fileID: 1178294422}
+  pm: {fileID: 0}
   currentView: 0
 --- !u!4 &1795125596
 Transform:

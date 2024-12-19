@@ -14,9 +14,9 @@ public class ArtifactManager : MonoBehaviour
     [Header("Text Display Settings")]
     public float displayDuration = 5f; 
 
-    private bool _displayActive; 
-    private float _displayCountdown; 
-    private TextMesh _textMesh;                
+    private bool displayActive = false; 
+    private float displayCountdown = 0f; 
+    private TextMesh tm;                
 
     // **Light Component Variables**
     [Header("Light Settings")]
@@ -32,33 +32,33 @@ public class ArtifactManager : MonoBehaviour
     public float pulseIntensityMin = 0.5f;        
     public float pulseIntensityMax = 2f;          
 
-    private Light _artifactLight; 
+    private Light artifactLight; 
 
     public Transform camToLookAt;
 
-    public void Initialize()
+    void Start()
     {
-        _textMesh = GetComponentInChildren<TextMesh>();
-        if (_textMesh == null)
+        tm = GetComponentInChildren<TextMesh>();
+        if (tm == null)
         {
             Debug.LogError("TextMesh component not found in children of Artifact.");
         }
 
-        _artifactLight = GetComponent<Light>();
-        if (_artifactLight == null)
+        artifactLight = GetComponent<Light>();
+        if (artifactLight == null)
         {
-            _artifactLight = gameObject.AddComponent<Light>();
+            artifactLight = gameObject.AddComponent<Light>();
         }
 
-        _artifactLight.type = lightType;
-        _artifactLight.color = lightColor;
-        _artifactLight.intensity = lightIntensity;
-        _artifactLight.range = lightRange;
-        _artifactLight.shadows = enableShadows ? LightShadows.Soft : LightShadows.None;
+        artifactLight.type = lightType;
+        artifactLight.color = lightColor;
+        artifactLight.intensity = lightIntensity;
+        artifactLight.range = lightRange;
+        artifactLight.shadows = enableShadows ? LightShadows.Soft : LightShadows.None;
 
-        if (_artifactLight.type == LightType.Spot)
+        if (artifactLight.type == LightType.Spot)
         {
-            _artifactLight.spotAngle = 30f; 
+            artifactLight.spotAngle = 30f; 
         }
 
         camToLookAt = GameObject.Find("Camera").transform; // If camera object is renamed, this breaks
@@ -73,7 +73,7 @@ public class ArtifactManager : MonoBehaviour
         HandleTextDisplay();
 
         // **Make Text Look On Camera
-        _textMesh.transform.rotation = Quaternion.LookRotation(camToLookAt.forward);
+        tm.transform.rotation = Quaternion.LookRotation(camToLookAt.forward);
 
         // **Handle Dynamic Light Effects**
         if (enablePulsing)
@@ -97,29 +97,29 @@ public class ArtifactManager : MonoBehaviour
 
     private void HandleTextDisplay()
     {
-        if (!_displayActive) return;
-        
-        _displayCountdown -= Time.deltaTime;
-        
-        if (!(_displayCountdown <= 0f)) return;
-        
-        _displayActive = false;
-        _displayCountdown = 0f;
-        
-        if (_textMesh != null)
+        if (displayActive)
         {
-            _textMesh.text = "";
+            displayCountdown -= Time.deltaTime;
+            if (displayCountdown <= 0f)
+            {
+                displayActive = false;
+                displayCountdown = 0f;
+                if (tm != null)
+                {
+                    tm.text = "";
+                }
+            }
         }
     }
 
     public void DisplayText(string text)
     {
-        if (_textMesh != null)
+        if (tm != null)
         {
-            _displayActive = true;
-            _displayCountdown = displayDuration;
-            _textMesh.text = text;
-            SoundManager.Instance.PlaySound(Sound.ArtifactTalk, 0.3f);
+            displayActive = true;
+            displayCountdown = displayDuration;
+            tm.text = text;
+            SoundManager.instance.PlaySound(Sound.ARTIFACT_TALK, 0.3f);
         }
         else
         {
@@ -129,47 +129,51 @@ public class ArtifactManager : MonoBehaviour
 
     private void PulseLight()
     {
-        if (_artifactLight == null) return;
-        
-        // Calculate pulsing intensity using PingPong for smooth oscillation
-        float pulsingIntensity = Mathf.PingPong(Time.time * pulseSpeed, pulseIntensityMax - pulseIntensityMin) + pulseIntensityMin;
-        _artifactLight.intensity = pulsingIntensity;
+        if (artifactLight != null)
+        {
+            // Calculate pulsing intensity using PingPong for smooth oscillation
+            float pulsingIntensity = Mathf.PingPong(Time.time * pulseSpeed, pulseIntensityMax - pulseIntensityMin) + pulseIntensityMin;
+            artifactLight.intensity = pulsingIntensity;
+        }
     }
 
     #region Optional Light Control Methods
 
     public void SetLightColor(Color newColor)
     {
-        if (_artifactLight == null) return;
-        
-        _artifactLight.color = newColor;
+        if (artifactLight != null)
+        {
+            artifactLight.color = newColor;
+        }
     }
 
     public void SetLightIntensity(float newIntensity)
     {
-        if (_artifactLight == null) return;
-        
-        lightIntensity = newIntensity;
-        _artifactLight.intensity = newIntensity;
+        if (artifactLight != null)
+        {
+            lightIntensity = newIntensity;
+            artifactLight.intensity = newIntensity;
+        }
     }
 
     public void ToggleLight(bool isOn)
     {
-        if (_artifactLight == null) return;
-        
-        _artifactLight.enabled = isOn;
+        if (artifactLight != null)
+        {
+            artifactLight.enabled = isOn;
+        }
     }
 
     public void ChangeLightType(LightType newType)
     {
-        if (_artifactLight == null) return;
-        
-        _artifactLight.type = newType;
-        
-        // Optional: Adjust additional properties based on light type
-        if (newType == LightType.Spot)
+        if (artifactLight != null)
         {
-            _artifactLight.spotAngle = 30f; // Example value
+            artifactLight.type = newType;
+            // Optional: Adjust additional properties based on light type
+            if (newType == LightType.Spot)
+            {
+                artifactLight.spotAngle = 30f; // Example value
+            }
         }
     }
 

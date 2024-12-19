@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class EmptBlock : Block
 {
-    public override void Activate(bool b)
+    override public void Activate(bool b)
     {
         return;
     }

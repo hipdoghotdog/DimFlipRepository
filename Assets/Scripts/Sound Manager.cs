@@ -1,88 +1,51 @@
-using System;
+using System.Collections;
+using System.Collections.Generic;
 using UnityEngine;
-using Random = UnityEngine.Random;
 
-public enum Sound
-{
-    Step,
-    Lever,
-    Push,
-    ArtifactTalk,
+public enum Sound {
+    STEP,
+    LEVER,
+    PUSH,
+    ARTIFACT_TALK,
 }
 
 public class SoundManager : MonoBehaviour
 {
-    public AudioClip[] audioClips; // Array for sound effects
-    public AudioClip backgroundMusic; // The background music clip
 
-    public static SoundManager Instance;
+    public AudioClip[] audioClips;
 
-    private AudioSource _soundEffectsSource; // For sound effects
-    private AudioSource _musicSource; // For background music
+    public static SoundManager instance;
+    private AudioSource au;
 
-    private void Awake()
+    // Start is called before the first frame update
+    void Awake()
     {
-        if (Instance == null)
-        {
-            Instance = this;
-            DontDestroyOnLoad(gameObject);
-
-            // Add two AudioSources dynamically
-            _soundEffectsSource = gameObject.AddComponent<AudioSource>();
-            _musicSource = gameObject.AddComponent<AudioSource>();
-
-            // Configure musicSource for looping background music
-            _musicSource.loop = true;
-        }
-        else
-        {
-            Destroy(gameObject);
-        }
+        instance = this;
     }
 
-    private void Start()
-    {
-        PlayBackgroundMusic();
+    void Start() {
+        au = GetComponent<AudioSource>();
     }
 
-    public void PlaySound(Sound sound, float volume = 1f)
-    {
-        switch (sound)
-        {
-            case Sound.Step:
+    // Add volume scaling later
+    public void PlaySound(Sound sound, float volume = 1f) {
+        switch (sound){
+            case Sound.STEP:
                 int randSoundNumber = Random.Range(0, 3);
-                _soundEffectsSource.PlayOneShot(audioClips[randSoundNumber], volume);
+                au.PlayOneShot(audioClips[randSoundNumber], volume);
                 break;
-            case Sound.Lever:
-                _soundEffectsSource.PlayOneShot(audioClips[3], volume);
+            case Sound.LEVER:
+                au.PlayOneShot(audioClips[3], volume);
                 break;
-            case Sound.Push:
-                _soundEffectsSource.PlayOneShot(audioClips[4], volume);
+            case Sound.PUSH:
+                au.PlayOneShot(audioClips[4], volume);
                 break;
-            case Sound.ArtifactTalk:
+            case Sound.ARTIFACT_TALK:
                 int randSoundNumber2 = Random.Range(5, 9);
-                _soundEffectsSource.PlayOneShot(audioClips[randSoundNumber2], volume);
+                au.PlayOneShot(audioClips[randSoundNumber2], volume);
                 break;
-            default:
-                throw new ArgumentOutOfRangeException(nameof(sound), sound, null);
         }
     }
 
-    private void PlayBackgroundMusic(float volume = 0.5f)
-    {
-        if (backgroundMusic == null)
-        {
-            Debug.LogWarning("SoundManager: Background music clip is not assigned.");
-            return;
-        }
 
-        _musicSource.clip = backgroundMusic;
-        _musicSource.volume = volume;
-        _musicSource.Play();
-    }
-
-    public void StopBackgroundMusic()
-    {
-        _musicSource.Stop();
-    }
 }
