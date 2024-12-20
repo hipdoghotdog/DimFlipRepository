@@ -5850,6 +5850,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   emptyTemplate: {fileID: 0}
   gameManager: {fileID: 0}
+  natureTheme: {fileID: 11400000, guid: 8a8103c468ba1a44da192dedd487c810, type: 2}
+  ruinsTheme: {fileID: 11400000, guid: 1b0474804294e534681dc959f5218de4, type: 2}
   StartBlockPosition: {x: 0, y: 0, z: 0}
 --- !u!4 &1830950302
 Transform:
