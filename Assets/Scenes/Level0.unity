@@ -472,8 +472,18 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: "Controls:\r\n- Arrow Keys: Move\r\n- Space: Switch Perspective\r\n- Backspace:
-    Reset\r\n- E: Interact with Levers\r"
+  m_text: 'Controls:
+
+    - Arrow Keys: Move
+
+    - Space: Switch Perspective
+
+    -
+    Backspace: Reset
+
+    - E: Interact with Levers
+
+    - Esc: Menu'
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
   m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
