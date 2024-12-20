@@ -64,6 +64,10 @@ public class ArtifactManager : MonoBehaviour
         camToLookAt = GameObject.Find("Camera").transform; // If camera object is renamed, this breaks
     }
 
+    void Start() {
+        displayDuration = 6f;
+    }
+
     void Update()
     {
         // **Handle Artifact Movement**
