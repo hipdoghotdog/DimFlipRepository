@@ -127,7 +127,7 @@ public class GameManager : MonoBehaviour
 
     public void NextLevel()
     {
-        if (currentLevelIndex + 1 > levelBuilder.Levels.Count)
+        if (currentLevelIndex + 2 > levelBuilder.Levels.Count)
         {
             SceneManager.LoadScene("MenuScreen");
             return;
