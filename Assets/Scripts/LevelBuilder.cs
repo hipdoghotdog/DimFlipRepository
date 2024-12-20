@@ -101,7 +101,7 @@ public class LevelBuilder : MonoBehaviour
             },
             storyBlocks: new Dictionary<Vector3Int, string>
             {
-                { new Vector3Int(7, 2, 0), "The only way out is through." },
+                { new Vector3Int(7, 2, 0), "Hmmm, this note seems to be left by someone else, however the text is too smudged. Lets find another." },
             }
         ));
 
@@ -118,7 +118,7 @@ public class LevelBuilder : MonoBehaviour
             },
             storyBlocks: new Dictionary<Vector3Int, string>
             {
-                { new Vector3Int(7, 2, 0), "Hmmm, this note seems to be left by someone else, however the text is to smudged. Lets find another!" },
+                { new Vector3Int(7, 2, 0), "Day 2: Touching the artifact brought me to this strange place. I hope I can find my way out." },
             }
         ));
 
