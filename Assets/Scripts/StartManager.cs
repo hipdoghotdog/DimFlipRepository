@@ -26,7 +26,6 @@ public class StartManager : MonoBehaviour
 
     public void ResetSave()
     {
-        this.saveSystem = new SaveSystem(Application.persistentDataPath, "data");
-        saveSystem.ResetSave();
+        GameManager.Instance.saveSystem.ResetSave();
     }
 }
