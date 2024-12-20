@@ -12,7 +12,7 @@ public class ArtifactManager : MonoBehaviour
     public float speed = 5f;         
 
     [Header("Text Display Settings")]
-    public float displayDuration = 5f; 
+    public float displayDuration = 10f; 
 
     private bool _displayActive; 
     private float _displayCountdown; 

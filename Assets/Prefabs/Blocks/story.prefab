@@ -220,7 +220,10 @@ MonoBehaviour:
   isPushable: 0
   isPullable: 0
   indicator: {fileID: 0}
-  storyText: HELLO
+  storyText: I feel like I've been walking forever
+  rotationSpeed: 20
+  bobSpeed: 2
+  bobHeight: 0.1
 --- !u!95 &7988829067075661469
 Animator:
   serializedVersion: 5
@@ -231,7 +234,7 @@ Animator:
   m_GameObject: {fileID: 3946397339657139063}
   m_Enabled: 1
   m_Avatar: {fileID: 0}
-  m_Controller: {fileID: 9100000, guid: 26cfca1b09535634ba51f340fa4066a2, type: 2}
+  m_Controller: {fileID: 9100000, guid: 47a05f75cc15b55ddb01059a7c4aee4d, type: 2}
   m_CullingMode: 0
   m_UpdateMode: 0
   m_ApplyRootMotion: 0
