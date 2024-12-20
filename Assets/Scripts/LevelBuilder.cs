@@ -11,7 +11,10 @@ public class LevelBuilder : MonoBehaviour
     
     [HideInInspector]
     public GameManager gameManager;
-    
+
+    public ThemeData natureTheme;
+    public ThemeData ruinsTheme;
+
     [FormerlySerializedAs("_startBlockPosition")] [HideInInspector] public Vector3 StartBlockPosition;
 
     public Dictionary<int, GameObject> BlockTemplates;
@@ -20,6 +23,10 @@ public class LevelBuilder : MonoBehaviour
     public void Initialize(int levelIndex)
     {
         gameManager = GameManager.Instance;
+
+        ThemeData chosenTheme = (levelIndex < 5) ? ruinsTheme : natureTheme;
+        ThemeManager.Instance.ChangeTheme(chosenTheme);
+
         InitializeLevels();
         BuildDictionary();
         BuildLevel(levelIndex);

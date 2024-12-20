@@ -469,7 +469,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 475d8ba2881209d47b2cc65caa901f16, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  currentTheme: {fileID: 11400000, guid: 1b0474804294e534681dc959f5218de4, type: 2}
+  currentTheme: {fileID: 11400000, guid: 8a8103c468ba1a44da192dedd487c810, type: 2}
 --- !u!4 &847877274
 Transform:
   m_ObjectHideFlags: 0
