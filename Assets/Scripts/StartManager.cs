@@ -30,4 +30,9 @@ public class StartManager : MonoBehaviour
         GameManager.Instance.saveSystem.ResetSave();
         GameManager.Instance.LoadSaveFile();
     }
+
+    public void GoToMainMenu()
+    {
+        SceneManager.LoadScene("MenuScreen");
+    }
 }

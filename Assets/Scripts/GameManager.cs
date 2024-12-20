@@ -154,7 +154,7 @@ public class GameManager : MonoBehaviour
     {
         if (currentLevelIndex + 1 >= levelBuilder.Levels.Count)
         {
-            SceneManager.LoadScene("MenuScreen");
+            SceneManager.LoadScene("EndScreen");
             return;
         }
 
