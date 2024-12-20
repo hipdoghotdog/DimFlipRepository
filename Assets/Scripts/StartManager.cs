@@ -6,7 +6,7 @@ using UnityEngine.SceneManagement;
 public class StartManager : MonoBehaviour
 {
     [HideInInspector]
-    public SaveSystem saveSystem;
+    
     
     public void StartGame()
     {
@@ -26,7 +26,8 @@ public class StartManager : MonoBehaviour
 
     public void ResetSave()
     {
-        this.saveSystem = new SaveSystem(Application.persistentDataPath, "data");
-        saveSystem.ResetSave();
+        
+        GameManager.Instance.saveSystem.ResetSave();
+        GameManager.Instance.LoadSaveFile();
     }
 }

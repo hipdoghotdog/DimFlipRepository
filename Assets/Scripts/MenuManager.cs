@@ -91,6 +91,14 @@ public class MenuManager : MonoBehaviour
         buttonComponent.interactable = false;
     }
 
+    public void disableButtons()
+    {
+        foreach(Button b in buttonDictionary.Values)
+        {
+            b.interactable = false;
+        }
+    }
+
     private void LoadLevel(int level)
     {
         // Ensure the scene is in the build settings

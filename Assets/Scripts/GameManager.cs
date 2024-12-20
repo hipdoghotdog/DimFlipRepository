@@ -77,11 +77,26 @@ public class GameManager : MonoBehaviour
         {
             SceneManager.LoadScene("MenuScreen");
         }
+        else if (Input.GetKeyDown(KeyCode.F1))
+        {
+            Devload();
+        }
     }
 
     public void LoadSaveFile()
     {
+        MenuManager.Instance.disableButtons();
         int levelIndex = saveSystem.Load();
+        int[] ints = Enumerable.Range(0, levelIndex + 1).ToArray();
+        foreach (int i in ints)
+        {
+            MenuManager.Instance.buttonDictionary[i].interactable = true;
+        }
+    }
+
+    public void Devload()
+    {
+        int levelIndex = 10;
         int[] ints = Enumerable.Range(0, levelIndex + 1).ToArray();
         foreach (int i in ints)
         {
