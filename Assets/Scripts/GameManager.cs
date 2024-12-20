@@ -98,7 +98,7 @@ public class GameManager : MonoBehaviour
 
     private void ResetLevel()
     {
-        LoadLevel(currentLevelIndex);
+        LoadLevel(0);
     }
 
     private void OnSceneLoaded(Scene scene, LoadSceneMode mode)
@@ -127,6 +127,12 @@ public class GameManager : MonoBehaviour
 
     public void NextLevel()
     {
+        if (currentLevelIndex + 1 > levelBuilder.Levels.Count)
+        {
+            SceneManager.LoadScene("MenuScreen");
+            return;
+        }
+        
         CompletedLevels.Add(currentLevelIndex);
         LoadLevel(currentLevelIndex + 1);
     }
