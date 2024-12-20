@@ -49,7 +49,7 @@ public class LevelBuilder : MonoBehaviour
             },
             storyBlocks: new Dictionary<Vector3Int, string>
             {
-                { new Vector3Int(3, 1, 0), "A sudden shift in perspective reveals hidden pathways previously obscured." },
+                { new Vector3Int(3, 1, 0), "A sudden shift in perspective reveals\nhidden pathways previously obscured." },
             }
         ));
 
@@ -64,7 +64,7 @@ public class LevelBuilder : MonoBehaviour
             },
             storyBlocks: new Dictionary<Vector3Int, string>
             {
-                { new Vector3Int(1, 1, 2), "The artifact glows when we speak its name. Perhaps it's a guide." },
+                { new Vector3Int(1, 1, 2), "The artifact glows when we speak its name.\nPerhaps it's a guide." },
             }
         ));
 
@@ -80,7 +80,7 @@ public class LevelBuilder : MonoBehaviour
             },
             storyBlocks: new Dictionary<Vector3Int, string>
             {
-                { new Vector3Int(3, 1, 0), "The path begins in confusion, but every step forward brings clarity, or so they say." },
+                { new Vector3Int(3, 1, 0), "The path begins in confusion, but every step\nforward brings clarity, or so they say." },
                 { new Vector3Int(2, 3, 2), "They are always watching. Tread carefully." },
             }
         ));
@@ -101,7 +101,7 @@ public class LevelBuilder : MonoBehaviour
             },
             storyBlocks: new Dictionary<Vector3Int, string>
             {
-                { new Vector3Int(7, 2, 0), "Hmmm, this note seems to be left by someone else, however the text is too smudged. Lets find another." },
+                { new Vector3Int(7, 2, 0), "Hmmm, this note seems to be left by someone else,\nhowever the text is too smudged. Lets find another." },
             }
         ));
 
@@ -118,7 +118,7 @@ public class LevelBuilder : MonoBehaviour
             },
             storyBlocks: new Dictionary<Vector3Int, string>
             {
-                { new Vector3Int(7, 2, 0), "Day 2: Touching the artifact brought me to this strange place. I hope I can find my way out." },
+                { new Vector3Int(7, 2, 0), "Day 2: Touching the artifact brought me to this\nstrange place. I hope I can find my way out." },
             }
         ));
 
@@ -139,7 +139,7 @@ public class LevelBuilder : MonoBehaviour
             },
             storyBlocks: new Dictionary<Vector3Int, string>
             {
-                { new Vector3Int(6, 1, 0), "Day 3: I've been in here for a while now, but it seems to make more and more sense." },
+                { new Vector3Int(6, 1, 0), "Day 3: I've been in here for a while now, but\nit seems to make more and more sense." },
             }
         ));
 
@@ -161,7 +161,7 @@ public class LevelBuilder : MonoBehaviour
             },
             storyBlocks: new Dictionary<Vector3Int, string>
             {
-                { new Vector3Int(3, 2, 3), "Day 13: The artifact lets me see the world in entirely new ways... Maybe it'll help me find my way home." },
+                { new Vector3Int(3, 2, 3), "Day 13: The artifact lets me see the\nworld in entirely new ways...\nMaybe it'll help me find my way home." },
             }
         ));
 
@@ -214,7 +214,7 @@ public class LevelBuilder : MonoBehaviour
             storyBlocks: new Dictionary<Vector3Int, string>
             {
                 { new Vector3Int(10, 2, 5), "Day 33: It seems the boxes might provide a path forward..." },
-                { new Vector3Int(1, 1, 9), "Day 31: I've been stuck in here for days... I wonder if I'll ever make it out." },
+                { new Vector3Int(1, 1, 9), "Day 31: I've been stuck in here for days...\nI wonder if I'll ever make it out." },
             }
          ));
 
@@ -380,10 +380,10 @@ public class LevelBuilder : MonoBehaviour
                             {
                                 blockComponent.storyText = Levels[gameManager.currentLevelIndex].StoryBlocks[coord];
                             }
-                            else
-                            {
-                                blockComponent.storyText = "You discovered a piece of the story!";
-                            }
+                            // else
+                            // {
+                            //     blockComponent.storyText = "You discovered a piece of the story!";
+                            // }
 
                             //Collider col = block.GetComponent<Collider>();
                             //if (col != null) col.enabled = false; 

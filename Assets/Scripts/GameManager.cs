@@ -98,7 +98,7 @@ public class GameManager : MonoBehaviour
 
     private void ResetLevel()
     {
-        LoadLevel(0);
+        LoadLevel(currentLevelIndex);
     }
 
     private void OnSceneLoaded(Scene scene, LoadSceneMode mode)
