@@ -7,13 +7,7 @@ public class StartManager : MonoBehaviour
 {
     public void StartGame()
     {
-        if (GameManager.Instance)
-        {
-            GameManager.Instance.LoadLevel(0);
-            return;
-        }
-        
-        SceneManager.LoadScene("InitScene");
+        GameManager.Instance.StartGame();
     }
 
     public void QuitGame()

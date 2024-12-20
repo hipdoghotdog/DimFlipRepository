@@ -1,6 +1,4 @@
-using System;
 using System.Collections;
-using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 using UnityEngine.EventSystems;
@@ -10,41 +8,22 @@ public class GameManager : MonoBehaviour
 {
     public static GameManager Instance;
     public GameObject[,,] CurrentLevel;
-    
-    [HideInInspector]
-    public int currentLevelIndex;
-    
-    [HideInInspector]
-    public LevelBuilder levelBuilder;
-    
-    [HideInInspector]
-    public LevelFlipper levelFlipper;
-    
-    [HideInInspector]
-    public GameObject player;
-    
-    [HideInInspector]
-    public PlayerMovement playerMovement;
-    
-    [HideInInspector]
-    public CameraScript cameraScript;
-    
-    [HideInInspector]
-    public ArtifactManager artifactManager;
 
-    [HideInInspector]
-    public View currentView;
-
-    [HideInInspector]
-    public SaveSystem saveSystem;
+    [HideInInspector] public int currentLevelIndex;
+    [HideInInspector] public LevelBuilder levelBuilder;
+    [HideInInspector] public LevelFlipper levelFlipper;
+    [HideInInspector] public GameObject player;
+    [HideInInspector] public PlayerMovement playerMovement;
+    [HideInInspector] public CameraScript cameraScript;
+    [HideInInspector] public ArtifactManager artifactManager;
+    [HideInInspector] public View currentView;
+    [HideInInspector] public SaveSystem saveSystem;
 
     public enum View
     {
         SideView,
         TopdownView
     }
-    
-    
 
     private void Awake()
     {
@@ -61,9 +40,21 @@ public class GameManager : MonoBehaviour
 
     private void Start()
     {
-        this.saveSystem = new SaveSystem(Application.persistentDataPath, "data");
-        LoadSaveFile();
-        LoadLevel(currentLevelIndex);
+        InitializeGame();
+    }
+
+    private void InitializeGame()
+    {
+        saveSystem = new SaveSystem(Application.persistentDataPath, "data");
+
+        // Load the menu scene after initialization
+        SceneManager.LoadScene("MenuScreen");
+    }
+
+    public void StartGame()
+    {
+        // Start the game by loading the first level
+        LoadLevel(0);
     }
 
     private void Update()
@@ -80,7 +71,7 @@ public class GameManager : MonoBehaviour
 
         else if (Input.GetKeyDown(KeyCode.Escape))
         {
-           MenuManager.Instance.ToggleMenu();
+            MenuManager.Instance.ToggleMenu();
         }
     }
 
@@ -99,7 +90,7 @@ public class GameManager : MonoBehaviour
         currentLevelIndex = levelIndex;
         saveSystem.Save(currentLevelIndex);
         MenuManager.Instance.buttonDictionary[levelIndex].interactable = true;
-        
+
         currentView = View.SideView;
 
         // Load the scene corresponding to the level
@@ -107,8 +98,9 @@ public class GameManager : MonoBehaviour
 
         // Initialize managers after the scene is loaded
         SceneManager.sceneLoaded += OnSceneLoaded;
-        
-        EventSystem.current.SetSelectedGameObject(null);
+
+        // Deselect currently selected UI element
+        EventSystem.current?.SetSelectedGameObject(null);
     }
 
     private void ResetLevel()
@@ -120,14 +112,13 @@ public class GameManager : MonoBehaviour
     {
         SceneManager.sceneLoaded -= OnSceneLoaded;
 
-        // Find or initialize managers for the new scene
+        // Initialize managers for the loaded scene
         InitializeManagers();
     }
 
     private void InitializeManagers()
     {
         player = GameObject.FindGameObjectWithTag("Player");
-        
         levelBuilder = FindObjectOfType<LevelBuilder>();
         levelFlipper = FindObjectOfType<LevelFlipper>();
         playerMovement = FindObjectOfType<PlayerMovement>();
@@ -142,15 +133,15 @@ public class GameManager : MonoBehaviour
 
     public void NextLevel()
     {
-        if (currentLevelIndex + 2 > levelBuilder.Levels.Count)
+        if (currentLevelIndex + 1 >= levelBuilder.Levels.Count)
         {
             SceneManager.LoadScene("MenuScreen");
             return;
         }
-        
+
         LoadLevel(currentLevelIndex + 1);
     }
-
+    
     public void CheckGravity()
     {
         bool blocksFell = true;
