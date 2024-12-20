@@ -220,7 +220,10 @@ MonoBehaviour:
   isPushable: 0
   isPullable: 0
   indicator: {fileID: 0}
-  storyText: HELLO
+  storyText: I feel like I've been walking forever
+  rotationSpeed: 20
+  bobSpeed: 2
+  bobHeight: 0.1
 --- !u!95 &7988829067075661469
 Animator:
   serializedVersion: 5
