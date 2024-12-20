@@ -36,6 +36,7 @@ public class MenuManager : MonoBehaviour
         DontDestroyOnLoad(eventSystem);
         PopulateMenu();
         menuCanvas.enabled = false;
+
     }
 
     private void PopulateMenu()
@@ -105,6 +106,7 @@ public class MenuManager : MonoBehaviour
 
     public void ToggleMenu()
     {
+        
         menuCanvas.enabled = !menuCanvas.enabled;
     }
 }

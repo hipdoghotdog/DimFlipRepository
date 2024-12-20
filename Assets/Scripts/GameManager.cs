@@ -35,13 +35,16 @@ public class GameManager : MonoBehaviour
     [HideInInspector]
     public View currentView;
 
+    [HideInInspector]
+    public SaveSystem saveSystem;
+
     public enum View
     {
         SideView,
         TopdownView
     }
     
-    [HideInInspector] public HashSet<int> CompletedLevels = new HashSet<int>();
+    
 
     private void Awake()
     {
@@ -58,6 +61,8 @@ public class GameManager : MonoBehaviour
 
     private void Start()
     {
+        this.saveSystem = new SaveSystem(Application.persistentDataPath, "data");
+        LoadSaveFile();
         LoadLevel(currentLevelIndex);
     }
 
@@ -79,10 +84,20 @@ public class GameManager : MonoBehaviour
         }
     }
 
+    public void LoadSaveFile()
+    {
+        int levelIndex = saveSystem.Load();
+        int[] ints = Enumerable.Range(0, levelIndex + 1).ToArray();
+        foreach (int i in ints)
+        {
+            MenuManager.Instance.buttonDictionary[i].interactable = true;
+        }
+    }
+
     public void LoadLevel(int levelIndex)
     {
         currentLevelIndex = levelIndex;
-        
+        saveSystem.Save(currentLevelIndex);
         MenuManager.Instance.buttonDictionary[levelIndex].interactable = true;
         
         currentView = View.SideView;
@@ -133,7 +148,6 @@ public class GameManager : MonoBehaviour
             return;
         }
         
-        CompletedLevels.Add(currentLevelIndex);
         LoadLevel(currentLevelIndex + 1);
     }
 
