@@ -118,7 +118,7 @@ public class LevelBuilder : MonoBehaviour
             },
             storyBlocks: new Dictionary<Vector3Int, string>
             {
-                { new Vector3Int(7, 2, 0), "STORY1" },
+                { new Vector3Int(7, 2, 0), "Hmmm, this note seems to be left by someone else, however the text is to smudged. Lets find another!" },
             }
         ));
 
@@ -139,7 +139,7 @@ public class LevelBuilder : MonoBehaviour
             },
             storyBlocks: new Dictionary<Vector3Int, string>
             {
-                { new Vector3Int(6, 1, 0), "STORY2" },
+                { new Vector3Int(6, 1, 0), "Day 3: I've been in here for a while now, but it seems to make more and more sense." },
             }
         ));
 
@@ -161,7 +161,7 @@ public class LevelBuilder : MonoBehaviour
             },
             storyBlocks: new Dictionary<Vector3Int, string>
             {
-                { new Vector3Int(3, 2, 3), "STORY3" },
+                { new Vector3Int(3, 2, 3), "Day 13: The artifact lets me see the world in entirely new ways... Maybe it'll help me find my way home." },
             }
         ));
 
@@ -186,8 +186,8 @@ public class LevelBuilder : MonoBehaviour
             },
             storyBlocks: new Dictionary<Vector3Int, string>
             {
-                { new Vector3Int(0, 3, 3), "STORY4" },
-                { new Vector3Int(2, 1, 4), "STORY5" },
+                { new Vector3Int(0, 3, 3), "Day 17: I wonder how many levers there are..." },
+                { new Vector3Int(2, 1, 4), "Day 19: I keep finding more and more levers." },
             }
             ));
 
@@ -213,8 +213,8 @@ public class LevelBuilder : MonoBehaviour
              },
             storyBlocks: new Dictionary<Vector3Int, string>
             {
-                { new Vector3Int(10, 2, 5), "STORY6" },
-                { new Vector3Int(1, 1, 9), "STORY7" },
+                { new Vector3Int(10, 2, 5), "Day 33: It seems the boxes might provide a path forward..." },
+                { new Vector3Int(1, 1, 9), "Day 31: I've been stuck in here for days... I wonder if I'll ever make it out." },
             }
          ));
 
@@ -239,7 +239,7 @@ public class LevelBuilder : MonoBehaviour
             },
             storyBlocks: new Dictionary<Vector3Int, string>
             {
-                { new Vector3Int(1, 3, 2), "STORY8" },
+                { new Vector3Int(1, 3, 2), "Day 39: Right... More boxes... of course..." },
             }
             ));
 
