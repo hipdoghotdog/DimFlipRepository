@@ -46,7 +46,7 @@ public class GameManager : MonoBehaviour
     private void InitializeGame()
     {
         saveSystem = new SaveSystem(Application.persistentDataPath, "data");
-
+        LoadSaveFile();
         // Load the menu scene after initialization
         SceneManager.LoadScene("MenuScreen");
     }
@@ -69,9 +69,13 @@ public class GameManager : MonoBehaviour
             ResetLevel();
         }
 
-        else if (Input.GetKeyDown(KeyCode.Escape))
+        else if (Input.GetKeyDown(KeyCode.Tab))
         {
             MenuManager.Instance.ToggleMenu();
+        }
+        else if (Input.GetKeyDown(KeyCode.Escape))
+        {
+            SceneManager.LoadScene("MenuScreen");
         }
     }
 

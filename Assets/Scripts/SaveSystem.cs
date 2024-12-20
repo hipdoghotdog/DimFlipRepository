@@ -43,6 +43,29 @@ public class SaveSystem
         else
             Debug.Log("Level already saved");
     }
+
+    public void ResetSave()
+    {
+        string fullPath = Path.Combine(dataDirPath, dataFileName);
+        try
+        {
+            Directory.CreateDirectory(Path.GetDirectoryName(fullPath));
+
+            
+
+            using (FileStream stream = new FileStream(fullPath, FileMode.Create))
+            {
+                using (StreamWriter writer = new StreamWriter(stream))
+                {
+                    writer.Write(0);
+                }
+            }
+        }
+        catch (Exception e)
+        {
+            Debug.LogError("Error occured when trying to save data to file: " + fullPath + "\n" + e);
+        }
+    }
     
     public int Load()
     {
