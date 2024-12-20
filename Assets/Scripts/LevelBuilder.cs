@@ -24,7 +24,7 @@ public class LevelBuilder : MonoBehaviour
     {
         gameManager = GameManager.Instance;
 
-        ThemeData chosenTheme = (levelIndex < 5) ? ruinsTheme : natureTheme;
+        ThemeData chosenTheme = (levelIndex < 6) ? ruinsTheme : natureTheme;
         ThemeManager.Instance.ChangeTheme(chosenTheme);
 
         InitializeLevels();
